@@ -1,0 +1,14 @@
+
+### Post new user
+POST http://localhost:8080/users -H "Content-Type: application/json" -d '{"username":"newuser"}'    
+
+
+### Get all users
+GET http://localhost:8080/users
+```
+
+
+
+### Delete user by id
+DELETE http://localhost:1781/users/{id}
+```
