@@ -1,0 +1,15 @@
+FROM node:lts as builder
+WORKDIR /app/
+
+#Run build for webui
+COPY webui webui
+WORKDIR /app/webui
+RUN npm run build-prod
+
+# Stage 2: Serve the application from Nginx
+FROM nginx:stable
+COPY --from=builder /app/webui/dist /usr/share/nginx/html
+
+#expose port 5173
+EXPOSE 5173
+CMD ["nginx", "-g", "daemon off;"]

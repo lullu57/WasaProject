@@ -1,0 +1,709 @@
+openapi: 3.0.0
+info:
+  title: WasaProject
+  description: The WASA Course Project, building an image sharing platform
+  version: 1.0.0
+tags:
+  - name: login
+  - name: user
+  - name: comment
+  - name: like
+  - name: photo
+  
+security:
+  - BearerAuth: []
+paths:
+  /session:
+    post:
+      tags: [login]
+      summary: Logs in the user
+      description: |
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string 
+                  example: Maria 
+                  pattern: 'ˆ.*?$' 
+                  minLength: 3 
+                  maxLength: 16
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  identifier:
+                  # change here if you decide to use an integer # or any other type of identifier
+                    type: string
+                    example: "abcdef012345"  
+        '400': { $ref: "#/components/responses/BadRequest" }
+        '500': { $ref: "#/components/responses/ServerError" }
+  /users:
+    post:
+      tags: [user]
+      summary: Creates a new user
+      operationId: createUser
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+                
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /stream:
+    get:
+      tags: [photo]
+      summary: Returns the user's stream
+      operationId: getMyStream
+      responses:
+        '200':
+          description: action successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+                  minItems: 0
+                  maxItems: 100
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/username/{username}:
+    parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/username'
+    patch:
+      tags: [user]
+      summary: Set My User Name
+      description: Set the user's username.
+      operationId: setMyUserName
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  
+    get:
+      tags: [user]
+      summary: Get User Profile
+      description: Get the profile of a user.
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/id/{userID}:
+    parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/user'
+    get:
+      tags: [user]
+      summary: Get User Profile
+      description: Get the profile of a user.
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/followers/{username}:
+    parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/username'
+    post:
+      tags: [user]
+      summary: Follow User
+      description: Follow a user.
+      operationId: followUser
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+    delete:
+      tags: [user]
+      summary: Unfollow User
+      description: Unfollow a user.
+      operationId: unfollowUser
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+    get:
+      tags: [user]
+      summary: Get Followers
+      description: Get the followers of a user.
+      operationId: getFollowers
+      responses:
+        '200':
+          description: Followers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                  minItems: 0
+                  maxItems: 100
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/bans/{username}:
+    parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/username'
+    post:
+      tags: [user]
+      summary: Ban User
+      description: Ban a user.
+      operationId: banUser
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      tags: [user]
+      summary: Unban User
+      description: Unban a user.
+      operationId: unbanUser
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /bans:
+    get:
+      tags: [user]
+      summary: Get Banned Users
+      description: Get the list of banned users.
+      operationId: getBannedUsers
+      responses:
+        '200':
+          description: Banned users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                  minItems: 0
+                  maxItems: 100
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /comments/{commentId}: 
+    parameters:
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/commentId'
+    delete:
+      tags: [comment]
+      summary: Delete Comment
+      description: Delete a comment.
+      operationId: uncommentPhoto
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    
+  /photos/{photoId}/comments:
+    parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/photoId'
+    post:
+      tags: [comment]
+      summary: Comment Photo
+      description: Comment a photo.
+      operationId: commentPhoto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+    get:
+      tags: [comment]
+      summary: Get Comments
+      description: Get the comments of a photo.
+      operationId: getComments
+      responses:
+        '200':
+          description: Comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+                  minItems: 0
+                  maxItems: 100
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  :
+    post:
+      tags: [photo]
+      summary: Upload Photo
+      description: Upload a photo.
+      operationId: uploadPhoto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Photo'
+      responses:
+        '201':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /photos/{photoId}:
+    get:
+      tags: [photo]
+      summary: Get Photo
+      description: Get a photo.
+      operationId: getPhoto
+      responses:
+        '200':
+          description: Photo retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+    delete:
+      tags: [photo]
+      summary: Delete Photo
+      description: Delete a photo.
+      operationId: deletePhoto
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /photos/{photoId}/likes:
+    parameters:
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/photoId'
+    post:
+      tags: [like]
+      summary: Like Photo
+      description: Like a photo.
+      operationId: likePhoto
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+    delete:
+      tags: [like]
+      summary: Unlike Photo
+      description: Unlike a photo.
+      operationId: unlikePhoto
+      responses:
+        '200':
+          description: action successful
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /username/{userId}/:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/user'
+    get:
+      tags: [user]
+      summary: Get User usernae
+      description: Get the username of a user.
+      operationId: getUsername
+      responses:
+        '200':
+          description: Username retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /likes/{photoId}/: 
+    parameters:
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/photoId'
+    get:
+      tags: [like]
+      summary: Get Like
+      description: Get whether a user liked a photo.
+      operationId: isLiked
+      responses:
+        '200':
+          description: Like retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" } 
+  /follows/{userId}: 
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/user'
+    get:
+      tags: [user]
+      summary: Get if the User Is Followed
+      description: Check whether a user is followed by the current user.
+      operationId: isUserFollowed
+      responses:
+        '200':
+          description: Follow retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /bans/{userId}: 
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/user'
+    get:
+      tags: [user]
+      summary: Get if the User Is Banned
+      description: Check whether a user is banned.
+      operationId: isUserBanned
+      responses:
+        '200':
+          description: Ban retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: boolean
+components:
+  responses:
+    BadRequest:
+      description: Error Code 400
+    Unauthorized:
+      description: Error Code 401
+    ServerError: 
+      description: Error Code 500
+  schemas:
+    Success: 
+      type: string
+      minLength: 1
+      maxLength: 100
+      pattern: '^[a-zA-Z0-9]$'
+      description: A message indicating the success of an operation
+    Comment:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 150
+          pattern: '^[a-zA-Z0-9]$'
+          description: The Content of the comment
+        photoId: 
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: '^[a-zA-Z0-9]$'
+          description: The identifier of a photo
+        userId:
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: '^[a-zA-Z0-9_]+$'
+          description: The identifier of the commentor
+        commentId:
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: '^[a-zA-Z0-9]$'
+          description: The identifier of a comment
+      description: the comment object
+    Photo:
+      type: object
+      properties:
+        photoId:
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: '^[a-zA-Z0-9_]{10,20}$'
+          description: The unique identifier of the photo.
+        userId:
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: '^[a-zA-Z0-9_]{10,20}$'
+          description: The identifier of the user who uploaded the photo.
+        uploadTime:
+          type: string
+          format: date-time
+          description: The timestamp of when the photo was uploaded.
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+          description: An array of likes associated with the photo.
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+          description: An array of comments associated with the photo.
+      description: The photo object, including metadata and associations like likes and comments.
+    Like:
+      type: object
+      properties:
+        userId:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_]+$'
+          description: The identifier of the user who liked the photo.
+        photoId:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_]+$'
+          description: The identifier of the photo being liked.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of when the like was made.
+      required:
+        - userId
+        - photoId
+      description: Represents a like made by a user to a photo.
+
+    username:
+      type: string
+      minLength: 10
+      maxLength: 20
+      pattern: "^[a-zA-Z0-9_]+$"
+      description: A unique user identifier
+    commentId:
+      type: string
+      minLength: 10
+      maxLength: 20
+      pattern: "^[a-zA-Z0-9_]+$"
+      description: A unique comment identifier
+    user: 
+      type: object
+      properties:
+        userId:
+          type: string
+          minLength: 10
+          maxLength: 20
+          pattern: "^[a-zA-Z0-9_]+$"
+          description: A unique user identifier
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: "^[a-zA-Z0-9_]+$"
+          description: The user's username
+        followers:
+          type: array
+          items:
+            type: string
+            description: Unique identifier of a follower.
+            minLength: 10
+            maxLength: 20
+            pattern: "^[a-zA-Z0-9_]+$"
+          description: An array of unique identifiers for the user's followers.
+        following:
+          type: array
+          items:
+            type: string
+            description: Unique identifier of a followed user.
+            minLength: 10
+            maxLength: 20
+            pattern: "^[a-zA-Z0-9_]+$"
+          description: An array of unique identifiers for the users being followed by the user.
+        photos:
+          type: array
+          items:
+            type: string
+            description: Unique identifier of a photo uploaded by the user.
+            minLength: 10
+            maxLength: 20
+            pattern: "^[a-zA-Z0-9_]+$"
+          description: An array of unique identifiers for the photos uploaded by the user.
+      required:
+        - userId
+        - username
+      description: Represents a user, including information about their followers, who they're following, and their photos.
+
+
+    
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
