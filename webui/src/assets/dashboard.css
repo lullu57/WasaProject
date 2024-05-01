@@ -1,5 +1,7 @@
 body {
 	font-size: 0.875rem;
+	font-family: 'Tisa', sans-serif; /* Improved font for better readability */
+	background-color: #e9ecef; /* Light grey background for less strain on eyes */
 }
 
 .feather {
@@ -10,30 +12,24 @@ body {
 /*
  * Sidebar
  */
-.navbar {
-	background-color: #007bff; /* Example of a brighter color */
-	padding: 10px 15px; /* Increased padding */
-  }
-  
-  .navbar-brand {
-	font-size: 1.25rem; /* Larger font size */
+ .navbar {
+	background-color: #0056b3; /* Slightly darker blue for better contrast */
   }
   
   .sidebar {
-	background-color: #67b0f9; /* Light background color */
-	width: 200px; /* Increased width */
+	background-color: #f8f9fa; /* Lighter grey for a modern look */
+	color: #333; /* Darker text for better readability */
+  }
+  
+  .nav-link.active, .nav-link:hover {
+	background-color: #e9ecef; /* Light grey background on hover/active */
+	color: #0056b3; /* Theme color for text */
   }
   
   .nav-link {
-	display: flex;
-	align-items: center;
-	gap: 10px; /* Adds space between icon and text */
-	transition: background-color 0.3s ease-in-out; /* Smooth transition for hover */
+	color: #007bff; /* Blue text for better visibility */
   }
   
-  .nav-link:hover {
-	background-color: #b6d5f3; /* Light background on hover */
-  }
 
 .sidebar {
 	position: fixed;
@@ -117,3 +113,7 @@ body {
 	border-color: transparent;
 	box-shadow: 0 0 0 3px rgba(255 255 255 / 25%);
 }
+
+button:hover {
+	background-color: #0056b3; /* Darker on hover for interaction feedback */
+  }
