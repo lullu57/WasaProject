@@ -145,9 +145,10 @@ const changeUsername = async () => {
     console.error("Error changing username:", error);
   }
 };
-const handlePhotoDeleted = async(photoId) => {
-      this.detailedPhotos = this.detailedPhotos.filter(photo => photo.photoId !== photoId);
-    }
+
+const handlePhotoDeleted = (photoId) => {
+  detailedPhotos.value = detailedPhotos.value.filter(photo => photo.photoId !== photoId);
+};
 
 onMounted(fetchUserProfile);
 </script>
