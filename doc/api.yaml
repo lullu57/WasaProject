@@ -147,7 +147,7 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/user'
+            $ref: '#/components/schemas/User'
     get:
       tags: [user]
       summary: Get User Profile
@@ -362,7 +362,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  :
+  /photos:
     post:
       tags: [photo]
       summary: Upload Photo
@@ -467,7 +467,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/user'
+          $ref: '#/components/schemas/User'
     get:
       tags: [user]
       summary: Get User usernae
@@ -512,7 +512,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/user'
+          $ref: '#/components/schemas/User'
     get:
       tags: [user]
       summary: Get if the User Is Followed
@@ -531,7 +531,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/user'
+          $ref: '#/components/schemas/User'
     get:
       tags: [user]
       summary: Get if the User Is Banned
@@ -653,7 +653,13 @@ components:
       maxLength: 20
       pattern: "^[a-zA-Z0-9_]+$"
       description: A unique comment identifier
-    user: 
+    photoId:
+      type: string
+      minLength: 10
+      maxLength: 20
+      pattern: "^[a-zA-Z0-9_]{10,20}$"
+      description: "The unique identifier of the photo."
+    User: 
       type: object
       properties:
         userId:
