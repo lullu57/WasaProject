@@ -15,7 +15,8 @@ security:
 paths:
   /session:
     post:
-      tags: [login]
+      tags:
+        - login
       summary: Logs in the user
       description: |
         If the user does not exist, it will be created,
@@ -37,19 +38,41 @@ paths:
                   maxLength: 16
         required: true
       responses:
-        '201':
-          description: User log-in action successful
+        '200':
+          description: User log-in action successful, existing user logged in.
           content:
             application/json:
               schema:
-                type: object 
+                type: object
                 properties:
                   identifier:
-                  # change here if you decide to use an integer # or any other type of identifier
                     type: string
-                    example: "abcdef012345"  
-        '400': { $ref: "#/components/responses/BadRequest" }
-        '500': { $ref: "#/components/responses/ServerError" }
+                    example: "abcdef012345"
+        '201':
+          description: New user created and logged in successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: "abcdef012345"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Username already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Username already exists"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /users:
     post:
       tags: [user]
@@ -69,9 +92,18 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
-                
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Username already exists
+          content:
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Username already exists"
 
   /stream:
     get:
@@ -92,6 +124,38 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
 
+  /users/{username}:
+    patch:
+      tags:
+        - user
+      summary: Set My User Name
+      description: Set the user's username.
+      operationId: setMyUserName
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: New username to set for the user.
+      responses:
+        '200':
+          description: Username updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Username updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /users/username/{username}:
     parameters:
         - name: username
@@ -99,31 +163,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/username'
-    patch:
-      tags: [user]
-      summary: Set My User Name
-      description: Set the user's username.
-      operationId: setMyUserName
-      
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-
-      responses:
-        '200':
-          description: action successful
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Success'
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
-  
     get:
       tags: [user]
       summary: Get User Profile
@@ -172,6 +211,37 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/username'
+    get:
+      tags: [user]
+      summary: Get Followers
+      description: Get the followers of a user.
+      operationId: getFollowers
+      responses:
+        '200':
+          description: Followers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                  minItems: 0
+                  maxItems: 100
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/follows/{userId}:
+    parameters:
+    - name: userId
+      in: path
+      required: true
+      description: The unique identifier of the user to follow or unfollow.
+      schema:
+        type: string
+        minLength: 1
+        description: Unique identifier of the user.
     post:
       tags: [user]
       summary: Follow User
@@ -201,27 +271,6 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
-
-    get:
-      tags: [user]
-      summary: Get Followers
-      description: Get the followers of a user.
-      operationId: getFollowers
-      responses:
-        '200':
-          description: Followers retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-                  minItems: 0
-                  maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -266,6 +315,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
+
   /bans:
     get:
       tags: [user]
@@ -287,6 +337,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
+
   /comments/{commentId}: 
     parameters:
       - name: commentId
@@ -385,8 +436,31 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
+    get:
+      tags: [photo]
+      summary: Get Photos
+      description: Retrieve all photos from the database.
+      operationId: getPhotos
+      responses:
+        '200':
+          description: List of photos retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /photos/{photoId}:
+    parameters:
+    - name: photoId
+      in: path
+      required: true
+      description: The unique identifier of the photo.
+      schema:
+        type: string
     get:
       tags: [photo]
       summary: Get Photo
@@ -403,7 +477,6 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
-
     delete:
       tags: [photo]
       summary: Delete Photo
@@ -484,6 +557,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
+      
   /likes/{photoId}/: 
     parameters:
       - name: photoId
