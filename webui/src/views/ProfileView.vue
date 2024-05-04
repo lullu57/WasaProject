@@ -20,10 +20,11 @@
       <p>No profile data available.</p>
     </div>
     <div class="gallery">
-      <PhotoCard 
-        v-for="photo in detailedPhotos" 
+      <PhotoCard
+      v-for="photo in detailedPhotos"
         :key="photo.photoId"
         :photo="photo"
+        @photoDeleted="handlePhotoDeleted"
       />
     </div>
   </div>
@@ -144,6 +145,9 @@ const changeUsername = async () => {
     console.error("Error changing username:", error);
   }
 };
+const handlePhotoDeleted = async(photoId) => {
+      this.detailedPhotos = this.detailedPhotos.filter(photo => photo.photoId !== photoId);
+    }
 
 onMounted(fetchUserProfile);
 </script>

@@ -7,21 +7,23 @@
       <div class="photo-actions">
         <button @click="toggleLike">{{ photo.isLiked ? 'Unlike' : 'Like' }} ({{ photo.likesCount }})</button>
         <button @click="toggleComments">Comments ({{ photo.comments.length }})</button>
+        <!-- Delete photo button, visible only to the photo owner -->
+        <button v-if="photo.userId === userId" @click="deletePhoto(photo.photoId)" class="delete-photo">Delete</button>
       </div>
       <div v-if="showComments" class="comments-section">
         <div class="comment-form">
           <input v-model="newComment" placeholder="Write a comment..." class="comment-input"/>
-          <button @click="postComment" class="post-comment">Post</button> 
+          <button @click="postComment" class="post-comment">Post</button>
         </div>
         <div class="comment" v-for="comment in photo.comments" :key="comment.commentId">
           <strong>{{ comment.username }}</strong>: {{ comment.content }}
-          <!-- Conditional rendering based on the computed userId -->
           <button v-if="comment.userId === userId" @click="deleteComment(comment.commentId)" class="delete-comment">Delete</button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import api from '@/services/axios';
@@ -106,6 +108,19 @@ export default {
         this.photo.comments = this.photo.comments.filter(comment => comment.commentId !== commentId);
       } catch (error) {
         console.error('Failed to delete comment', error);
+      }
+    },
+    async deletePhoto(photoId) {
+      try {
+        await api.delete(`/photos/${photoId}`, {
+          headers: {
+            Authorization: this.userId
+          }
+        });
+        // Emit an event to the parent component to remove the photo from the list
+        this.$emit('photoDeleted', photoId);
+      } catch (error) {
+        console.error('Failed to delete photo', error);
       }
     },
     formatDate(value) {
