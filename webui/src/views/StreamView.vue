@@ -5,6 +5,7 @@
         v-for="photo in photos" 
         :key="photo.photoId"
         :photo="photo"
+        :user-id="localStorage.getItem('userId')"
       />
     </div>
     <div v-else>
