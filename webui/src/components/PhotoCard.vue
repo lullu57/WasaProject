@@ -1,21 +1,21 @@
 <template>
   <div class="photo-card">
-    <img :src="'data:image/jpeg;base64,' + photo.imageData" alt="Photo" class="photo-image"/>
+    <img :src="'data:image/jpeg;base64,' + photoData.imageData" alt="Photo" class="photo-image"/>
     <div class="photo-info">
-      <h4>{{ photo.username }}</h4>
-      <p>{{ formatDate(photo.timestamp) }}</p>
+      <h4>{{ photoData.username }}</h4>
+      <p>{{ formatDate(photoData.timestamp) }}</p>
       <div class="photo-actions">
-        <button @click="toggleLike">{{ photo.isLiked ? 'Unlike' : 'Like' }} ({{ photo.likesCount }})</button>
-        <button @click="toggleComments">Comments ({{ photo.comments.length }})</button>
+        <button @click="toggleLike">{{ isLiked ? 'Unlike' : 'Like' }} ({{ photoData.likesCount }})</button>
+        <button @click="toggleComments">Comments ({{ photoData.comments.length }})</button>
         <!-- Delete photo button, visible only to the photo owner -->
-        <button v-if="photo.userId === userId" @click="deletePhoto(photo.photoId)" class="delete-photo">Delete</button>
+        <button v-if="photoData.userId === userId" @click="deletePhoto(photoData.photoId)" class="delete-photo">Delete</button>
       </div>
       <div v-if="showComments" class="comments-section">
         <div class="comment-form">
           <input v-model="newComment" placeholder="Write a comment..." class="comment-input"/>
           <button @click="postComment" class="post-comment">Post</button>
         </div>
-        <div class="comment" v-for="comment in photo.comments" :key="comment.commentId">
+        <div class="comment" v-for="comment in photoData.comments" :key="comment.commentId">
           <strong>{{ comment.username }}</strong>: {{ comment.content }}
           <button v-if="comment.userId === userId" @click="deleteComment(comment.commentId)" class="delete-comment">Delete</button>
         </div>
@@ -23,7 +23,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import api from '@/services/axios';
@@ -37,6 +36,7 @@ export default {
       showComments: true,
       isLiked: false,
       newComment: '',
+      photoData: { ...this.photo } // Initialize local state with prop data
     };
   },
   computed: {
@@ -55,7 +55,7 @@ export default {
         }
       };
       try {
-        const response = await api.get(`/photos/${this.photo.photoId}/likes`, config);
+        const response = await api.get(`/photos/${this.photoData.photoId}/likes`, config);
         this.isLiked = response.data.liked;
       } catch (error) {
         console.error('Failed to check like status', error);
@@ -69,11 +69,11 @@ export default {
       };
       try {
         if (!this.isLiked) {
-          await api.post(`/photos/${this.photo.photoId}/likes`, {}, config);
-          this.photo.likesCount++;
+          await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);
+          this.photoData.likesCount++;
         } else {
-          await api.delete(`/photos/${this.photo.photoId}/likes`, config);
-          this.photo.likesCount--;
+          await api.delete(`/photos/${this.photoData.photoId}/likes`, config);
+          this.photoData.likesCount--;
         }
         this.isLiked = !this.isLiked;
       } catch (error) {
@@ -87,9 +87,9 @@ export default {
             Authorization: this.userId
           }
         };
-        const response = await api.post(`/photos/${this.photo.photoId}/comments`, { content: this.newComment }, config);
+        const response = await api.post(`/photos/${this.photoData.photoId}/comments`, { content: this.newComment }, config);
         let username = 'You'; // Ideally fetch from server or use global state
-        this.photo.comments.push({
+        this.photoData.comments.push({
           username,
           content: this.newComment,
           commentId: response.data.commentId,
@@ -105,7 +105,7 @@ export default {
             Authorization: this.userId
           }
         });
-        this.photo.comments = this.photo.comments.filter(comment => comment.commentId !== commentId);
+        this.photoData.comments = this.photoData.comments.filter(comment => comment.commentId !== commentId);
       } catch (error) {
         console.error('Failed to delete comment', error);
       }
@@ -129,10 +129,6 @@ export default {
   }
 }
 </script>
-
-
-
-
 
 <style scoped>
 .photo-card {

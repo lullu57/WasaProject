@@ -13,7 +13,6 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/session", rt.wrap(doLogin))
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
-	rt.router.GET("/bans", rt.wrap(handleGetBannedUsers))
 
 	// User routes
 	rt.router.GET("/users", rt.wrap(HandleGetAllUsers))
@@ -45,6 +44,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/users/:userId/follows", rt.wrap(HandleFollowUser))
 
 	// ban routes
+	rt.router.GET("/bans", rt.wrap(handleGetBannedUsers))
 	rt.router.GET("/bans/:userId", rt.wrap(handleIsUserBanned))
 	rt.router.DELETE("/users/:userId/bans", rt.wrap(handleUnbanUser))
 	rt.router.POST("/users/:userId/bans", rt.wrap(handleBanUser))
