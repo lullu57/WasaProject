@@ -126,9 +126,9 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/id/{userID}:
+  /users/{userId}:
     parameters:
-        - name: userID
+        - name: userId
           in: path
           required: true
           schema:
@@ -151,34 +151,35 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/{username}/followers:
-    parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/username'
-    get:
-      tags: [user]
-      summary: Get Followers
-      description: Get the followers of a user.
-      operationId: getFollowers
-      responses:
-        '200':
-          description: Followers retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                   allOf:
-                    - $ref: '#/components/schemas/Photo'
-                    - minItems: 0
-                      maxItems: 100
+  # /users/followers/{username}:
+  #   parameters:
+  #       - name: username
+  #         in: path
+  #         required: true
+  #         schema:
+  #           $ref: '#/components/schemas/username'
+  #   get:
+  #     tags: [user]
+  #     summary: Get Followers
+  #     description: Get the followers of a user.
+  #     operationId: getFollowers
+  #     responses:
+  #       '200':
+  #         description: Followers retrieved successfully
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                  allOf:
+  #                   - $ref: '#/components/schemas/Photo'
+  #                   - minItems: 0
+  #                     maxItems: 100
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
+  #       "400": { $ref: "#/components/responses/BadRequest" }
+  #       "401": { $ref: "#/components/responses/Unauthorized" }
+  #       "500": { $ref: "#/components/responses/ServerError" }
+
 
   /users/{userId}/follows:
     parameters:
@@ -224,13 +225,14 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/bans/{username}:
+  /users/{userId}/bans:
     parameters:
-      - name: username
+      - name: userId
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/username'
+          type: string
+          description: The unique identifier of the user to ban or unban.
     post:
       tags: [user]
       summary: Ban User
@@ -499,13 +501,8 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
-  /users/{userId}/username:
-    parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/User'
+
+  /users/username:
     patch:
       tags:
         - user

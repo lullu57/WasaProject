@@ -47,7 +47,7 @@ const isOwnProfile = computed(() => userId === localStorageUserId);
 
 const fetchUserProfile = async () => {
   try {
-    const response = await api.get(`/users/id/${userId}`);
+    const response = await api.get(`/users/${userId}`);
     userProfile.value = response.data;
     if (userProfile.value && userProfile.value.photos) {
       fetchPhotoDetails(userProfile.value.photos);
@@ -119,14 +119,14 @@ const unfollowUser = async () => {
 };
 
 const banUser = async () => {
-  await api.post(`/users/bans/${userId}`, {}, {
+  await api.post(`/users/${userId}/bans`, {}, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = true;
 };
 
 const unbanUser = async () => {
-  await api.delete(`/users/bans/${userId}`, {
+  await api.delete(`/users/${userId}/bans`, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = false;

@@ -86,7 +86,7 @@ func HandleGetUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.
 }
 
 func HandleGetUserProfileID(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	userID := ps.ByName("userID") // Assuming userID is the URL parameter
+	userID := ps.ByName("userId") // Assuming userID is the URL parameter
 
 	ctx.Logger.Info("Retrieving user profile for userID: ", userID)
 	user, err := ctx.Database.GetUserProfileByID(userID)
@@ -200,25 +200,26 @@ func HandleGetAllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	json.NewEncoder(w).Encode(users)
 }
 
-func handleGetFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	username := ps.ByName("username")
-	if username == "" {
-		http.Error(w, "Invalid username parameter", http.StatusBadRequest)
-		return
-	}
+/*
+	func handleGetFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+		username := ps.ByName("username")
+		if username == "" {
+			http.Error(w, "Invalid username parameter", http.StatusBadRequest)
+			return
+		}
 
-	followers, err := ctx.Database.GetFollowersByUsername(username)
-	if err != nil {
-		ctx.Logger.Error("Failed to retrieve followers: ", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
+		followers, err := ctx.Database.GetFollowersByUsername(username)
+		if err != nil {
+			ctx.Logger.Error("Failed to retrieve followers: ", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		ctx.Logger.Infof("Followers fetched for user: %s", username)
+		response := map[string][]string{"followers": followers}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
-	ctx.Logger.Infof("Followers fetched for user: %s", username)
-	response := map[string][]string{"followers": followers}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
+*/
 func handleGetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	ctx.Logger.Infof("Fetching username for userId")
 	userId := ps.ByName("userId")

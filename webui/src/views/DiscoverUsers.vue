@@ -87,12 +87,12 @@
         user.processing = true;
         try {
           if (user.isBanned) {
-            await api.delete(`/users/bans/${user.userId}`, {
+            await api.delete(`/users/${user.userId}/bans`, {
               headers: { Authorization: localStorage.getItem('userId') }
             });
             user.isBanned = false;
           } else {
-            await api.post(`/users/bans/${user.userId}`, {}, {
+            await api.post(`/users/${user.userId}/bans`, {}, {
               headers: { Authorization: localStorage.getItem('userId') }
             });
             user.isBanned = true;
