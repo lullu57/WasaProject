@@ -38,16 +38,6 @@ paths:
                   maxLength: 16
         required: true
       responses:
-        '200':
-          description: User log-in action successful, existing user logged in.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  identifier:
-                    type: string
-                    example: "abcdef012345"
         '201':
           description: New user created and logged in successfully.
           content:
@@ -111,7 +101,7 @@ paths:
       summary: Returns the user's stream
       operationId: getMyStream
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             application/json:
@@ -134,6 +124,7 @@ paths:
           schema:
             type: string
             description: The unique identifier of the user.
+            pattern: "^[a-zA-Z0-9]+$"
     get:
       tags: [user]
       summary: Get User Profile
@@ -190,6 +181,8 @@ paths:
       schema:
         type: string
         minLength: 1
+        maxLength: 50
+        pattern: "^[a-zA-Z0-9]+$"
         description: Unique identifier of the user.
     post:
       tags: [user]
@@ -197,7 +190,7 @@ paths:
       description: Follow a user.
       operationId: followUser
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -214,7 +207,7 @@ paths:
       description: Unfollow a user.
       operationId: unfollowUser
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -232,6 +225,7 @@ paths:
         required: true
         schema:
           type: string
+          pattern: "^[a-zA-Z0-9]+$"
           description: The unique identifier of the user to ban or unban.
     post:
       tags: [user]
@@ -239,7 +233,7 @@ paths:
       description: Ban a user.
       operationId: banUser
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -255,7 +249,7 @@ paths:
       description: Unban a user.
       operationId: unbanUser
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -302,7 +296,7 @@ paths:
       description: Delete a comment.
       operationId: uncommentPhoto
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -413,6 +407,9 @@ paths:
       description: The unique identifier of the photo.
       schema:
         type: string
+        pattern: "^[a-zA-Z0-9]+$"
+        minLength: 1
+        maxLength: 50
     get:
       tags: [photo]
       summary: Get Photo
@@ -435,7 +432,7 @@ paths:
       description: Delete a photo.
       operationId: deletePhoto
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -474,7 +471,7 @@ paths:
       description: Add a like to a photo.
       operationId: AddLike
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -491,7 +488,7 @@ paths:
       description: Remove a like from a photo.
       operationId: RemloveLike
       responses:
-        '200':
+        '201':
           description: action successful
           content:
             text/plain:
@@ -515,6 +512,9 @@ paths:
           required: true
           schema:
             type: string
+            pattern: "^[a-zA-Z0-9]+$"
+            minLength: 1
+            maxLength: 50
           description: The current user ID.
       requestBody:
         description: New username to set for the user
@@ -619,6 +619,7 @@ components:
       description: A message indicating the success of an operation
     Comment:
       type: object
+      description: "A comment object representing a user's comment on a photo"
       properties:
         content:
           type: string
@@ -644,9 +645,9 @@ components:
           maxLength: 20
           pattern: '^[a-zA-Z0-9]$'
           description: The identifier of a comment
-      description: the comment object
     Photo:
       type: object
+      description: "A photo object representing a user's photo"
       properties:
         photoId:
           type: string
@@ -674,9 +675,10 @@ components:
           items:
             $ref: '#/components/schemas/Comment'
           description: An array of comments associated with the photo.
-      description: The photo object, including metadata and associations like likes and comments.
+      
     Like:
       type: object
+      description: Represents a like made by a user to a photo.
       properties:
         userId:
           type: string
@@ -697,7 +699,6 @@ components:
       required:
         - userId
         - photoId
-      description: Represents a like made by a user to a photo.
 
     username:
       type: string
@@ -719,6 +720,7 @@ components:
       description: "The unique identifier of the photo."
     User: 
       type: object
+      description: Represents a user, including information about their followers, who they're following, and their photos.
       properties:
         userId:
           type: string
@@ -762,7 +764,6 @@ components:
       required:
         - userId
         - username
-      description: Represents a user, including information about their followers, who they're following, and their photos.
 
 
     
