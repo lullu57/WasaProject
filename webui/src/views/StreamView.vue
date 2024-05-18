@@ -5,7 +5,7 @@
         v-for="photo in photos" 
         :key="photo.photoId"
         :photo="photo"
-        :user-id="localStorage.getItem('userId')"
+        :user-id="userId" 
       />
     </div>
     <div v-else>
@@ -13,7 +13,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import PhotoCard from '@/components/PhotoCard.vue';
@@ -26,7 +25,8 @@ export default {
   data() {
     return {
       photos: [],
-      error: ''
+      error: '',
+      userId: localStorage.getItem('userId') // Store userId in a data property
     };
   },
   async mounted() {
@@ -36,7 +36,7 @@ export default {
     async fetchStreamPhotos() {
       try {
         const response = await api.get('/stream', {
-          headers: { Authorization: localStorage.getItem('userId') }
+          headers: { Authorization: this.userId }
         });
         const photoIds = response.data; // Assuming this is an array of photo IDs
         await this.fetchPhotoDetails(photoIds);
@@ -49,14 +49,14 @@ export default {
       this.photos = await Promise.all(photoIds.map(async (photoId) => {
         try {
           const res = await api.get(`/photos/${photoId}`, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.userId }
           });
           const photo = res.data;
           // Process comments
           photo.comments = await Promise.all(photo.comments.map(async (comment) => {
             const userResponse = await api.get(`/users/${comment.userId}/username`);
             comment.username = userResponse.data.username;
-            comment.isOwner = comment.userId === localStorage.getItem('userId');
+            comment.isOwner = comment.userId === this.userId;
             return comment;
           }));
           return photo;
@@ -86,5 +86,5 @@ p {
   gap: 20px; /* Adjust gap for spacing between cards */
   justify-content: center; /* Center cards in the gallery if they don't fill all columns */
   align-items: start; /* Align items at the start of the grid line */
-  }
+}
 </style>
