@@ -166,10 +166,6 @@ func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 
 	// Convert image data to base64 for JSON compatibility.
 	imageData := base64.StdEncoding.EncodeToString(photo.ImageData)
-	if err != nil {
-		http.Error(w, "Error encoding image data", http.StatusInternalServerError)
-		return
-	}
 
 	// Construct the full response including comments
 	response := struct {
