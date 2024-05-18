@@ -118,9 +118,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Photo'
-                  minItems: 0
-                  maxItems: 100
+                   allOf:
+                    - $ref: '#/components/schemas/Photo'
+                    - minItems: 0
+                      maxItems: 100
+
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
 
@@ -155,30 +157,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
-
-  /users/username/{username}:
-    parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/username'
-    get:
-      tags: [user]
-      summary: Get User Profile
-      description: Get the profile of a user.
-      operationId: getUserProfile
-      responses:
-        '200':
-          description: User profile retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /users/id/{userID}:
     parameters:
@@ -224,9 +202,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
-                  minItems: 0
-                  maxItems: 100
+                   allOf:
+                    - $ref: '#/components/schemas/Photo'
+                    - minItems: 0
+                      maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -330,9 +309,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
-                  minItems: 0
-                  maxItems: 100
+                   allOf:
+                    - $ref: '#/components/schemas/User'
+                    - minItems: 0
+                      maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -405,9 +385,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Comment'
-                  minItems: 0
-                  maxItems: 100
+                   allOf:
+                    - $ref: '#/components/schemas/Comment'
+                    - minItems: 0
+                      maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -501,6 +482,21 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/photoId'
+    get:
+      tags: [like]
+      summary: Get Like
+      description: Get whether a user liked a photo.
+      operationId: isLiked
+      responses:
+        '200':
+          description: Like retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" } 
     post:
       tags: [like]
       summary: Like Photo
@@ -534,7 +530,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
-  /username/{userId}/:
+  /users/{userId}/username:
     parameters:
       - name: userId
         in: path
@@ -558,28 +554,6 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
       
-  /likes/{photoId}/: 
-    parameters:
-      - name: photoId
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/photoId'
-    get:
-      tags: [like]
-      summary: Get Like
-      description: Get whether a user liked a photo.
-      operationId: isLiked
-      responses:
-        '200':
-          description: Like retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Like'
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" } 
   /follows/{userId}: 
     parameters:
       - name: userId

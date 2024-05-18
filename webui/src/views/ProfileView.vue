@@ -67,7 +67,7 @@ const fetchPhotoDetails = async (photoIds) => {
       const res = await api.get(`/photos/${id}`);
       const photo = res.data;
       photo.comments = await Promise.all(photo.comments.map(async (comment) => {
-        const userResponse = await api.get(`/username/${comment.userId}`);
+        const userResponse = await api.get(`/users/${comment.userId}/username`);
         comment.username = userResponse.data.username;
         return comment;
       }));
@@ -145,7 +145,6 @@ const changeUsername = async () => {
     console.error("Error changing username:", error);
   }
 };
-
 const handlePhotoDeleted = (photoId) => {
   detailedPhotos.value = detailedPhotos.value.filter(photo => photo.photoId !== photoId);
 };

@@ -55,7 +55,7 @@ export default {
         }
       };
       try {
-        const response = await api.get(`/likes/${this.photo.photoId}`, config);
+        const response = await api.get(`/photos/${this.photo.photoId}/likes`, config);
         this.isLiked = response.data.liked;
       } catch (error) {
         console.error('Failed to check like status', error);

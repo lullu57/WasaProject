@@ -13,7 +13,6 @@ func (rt *_router) Handler() http.Handler {
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
 	rt.router.GET("/bans", rt.wrap(handleGetBannedUsers))
-	rt.router.GET("/users/username/:username", rt.wrap(HandleGetUserProfile))
 	rt.router.GET("/users/id/:userID", rt.wrap(HandleGetUserProfileID))
 	rt.router.GET("/photos", rt.wrap(handleGetPhotos))
 	rt.router.GET("/users", rt.wrap(HandleGetAllUsers))
@@ -21,8 +20,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/stream", rt.wrap(handleGetMyStream))
 	rt.router.GET("/users/followers/:username", rt.wrap(handleGetFollowers))
 	rt.router.GET("/photos/:photoId", rt.wrap(handleGetPhoto))
-	rt.router.GET("/username/:userId", rt.wrap(handleGetUsername))
-	rt.router.GET("/likes/:photoId", rt.wrap(HandleIsLiked))
+	rt.router.GET("/users/:userId/username", rt.wrap(handleGetUsername))
+	rt.router.GET("/photos/:photoId/likes", rt.wrap(HandleIsLiked))
 	rt.router.GET("/follows/:userId", rt.wrap(handleIsUserFollowed))
 	rt.router.GET("/bans/:userId", rt.wrap(handleIsUserBanned))
 	rt.router.POST("/users", rt.wrap(HandleAddUser))
