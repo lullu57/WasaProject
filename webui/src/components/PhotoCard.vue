@@ -76,7 +76,7 @@ export default {
           console.log('Like response:', response.status);
           this.photoData.likesCount++;
         } else {
-          const response = await api.delete(`/photos/${this.photoData.photoId}/likes`, {},config);
+          const response = await api.delete(`/photos/${this.photoData.photoId}/likes`, config);
           console.log('Unlike response:', response.status);
           this.photoData.likesCount--;
         }
