@@ -67,12 +67,12 @@
         user.processing = true;
         try {
           if (user.isFollowing) {
-            await api.delete(`/users/follows/${user.userId}`, {
+            await api.delete(`/users/${user.userId}/follows`, {
               headers: { Authorization: localStorage.getItem('userId') }
             });
             user.isFollowing = false;
           } else {
-            await api.post(`/users/follows/${user.userId}`, {}, {
+            await api.post(`/users/${user.userId}/follows`, {}, {
               headers: { Authorization: localStorage.getItem('userId') }
             });
             user.isFollowing = true;

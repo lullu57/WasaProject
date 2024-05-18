@@ -126,38 +126,6 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/{username}:
-    patch:
-      tags:
-        - user
-      summary: Set My User Name
-      description: Set the user's username.
-      operationId: setMyUserName
-      parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
-          description: New username to set for the user.
-      responses:
-        '200':
-          description: Username updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Username updated successfully
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
   /users/id/{userID}:
     parameters:
         - name: userID
@@ -183,7 +151,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/followers/{username}:
+  /users/{username}/followers:
     parameters:
         - name: username
           in: path
@@ -212,7 +180,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/follows/{userId}:
+  /users/{userId}/follows:
     parameters:
     - name: userId
       in: path
@@ -500,9 +468,9 @@ paths:
         "500": { $ref: "#/components/responses/ServerError" } 
     post:
       tags: [like]
-      summary: Like Photo
-      description: Like a photo.
-      operationId: likePhoto
+      summary: Add Photo
+      description: Add a like to a photo.
+      operationId: AddLike
       responses:
         '200':
           description: action successful
@@ -517,9 +485,9 @@ paths:
 
     delete:
       tags: [like]
-      summary: Unlike Photo
-      description: Unlike a photo.
-      operationId: unlikePhoto
+      summary: Remove Like
+      description: Remove a like from a photo.
+      operationId: RemloveLike
       responses:
         '200':
           description: action successful
@@ -538,6 +506,50 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/User'
+    patch:
+      tags:
+        - user
+      summary: Set My User Name
+      description: Set the user's username.
+      operationId: setMyUserName
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The current user ID.
+      requestBody:
+        description: New username to set for the user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newUsername:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                  pattern: "^[a-zA-Z0-9_]+$"
+                  example: "new_username"
+      responses:
+        '200':
+          description: Username updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Username updated successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
     get:
       tags: [user]
       summary: Get User usernae

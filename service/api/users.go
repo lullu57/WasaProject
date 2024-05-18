@@ -37,20 +37,27 @@ func HandleAddUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params,
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(responseMessage))
 }
-
 func HandleSetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Get the new username from URL parameters if needed
-	newUsername := ps.ByName("username")
-	if newUsername == "" {
+	// Parse the request body to get the new username
+	var reqBody struct {
+		NewUsername string `json:"newUsername"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&reqBody)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	if reqBody.NewUsername == "" {
 		http.Error(w, "New username must be provided", http.StatusBadRequest)
 		return
 	}
+
 	ctx.Logger.Info("CurrentID: ", ctx.User.ID)
 
 	currentUserID := ctx.User.ID // Ensure that ctx.User is populated correctly in the middleware
 
 	ctx.Logger.Info("Setting new username for user ID: ", currentUserID)
-	err := ctx.Database.SetUsername(currentUserID, newUsername)
+	err = ctx.Database.SetUsername(currentUserID, reqBody.NewUsername)
 	if err != nil {
 		ctx.Logger.Error("Failed to update username: ", err)
 		http.Error(w, "Failed to update username", http.StatusInternalServerError)

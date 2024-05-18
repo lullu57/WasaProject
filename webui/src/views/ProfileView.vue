@@ -105,14 +105,14 @@ const checkIfUserIsBanned = async () => {
   }
 };
 const followUser = async () => {
-  await api.post(`/users/follows/${userId}`, {}, {
+  await api.post(`/users/${userId}/follows`, {}, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = true;
 };
 
 const unfollowUser = async () => {
-  await api.delete(`/users/follows/${userId}`, {
+  await api.delete(`/users/${userId}/follows`, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = false;
@@ -135,7 +135,9 @@ const unbanUser = async () => {
 const changeUsername = async () => {
   try {
     console.log('Changing username to:', newUsername.value);
-    await api.patch(`/users/${newUsername.value}`, {}, {
+    await api.patch(`/users/${localStorageUserId}/username`, {
+      newUsername: newUsername.value
+    }, {
       headers: { Authorization: localStorageUserId }
     });
     userProfile.value.username = newUsername.value; // Update the username in the view
@@ -143,8 +145,10 @@ const changeUsername = async () => {
     alert('Username changed successfully!');
   } catch (error) {
     console.error("Error changing username:", error);
+    alert('Failed to change username.');
   }
 };
+
 const handlePhotoDeleted = (photoId) => {
   detailedPhotos.value = detailedPhotos.value.filter(photo => photo.photoId !== photoId);
 };
