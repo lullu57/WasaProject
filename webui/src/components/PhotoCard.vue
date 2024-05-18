@@ -34,9 +34,9 @@ export default {
   data() {
     return {
       showComments: true,
-      isLiked: false,
       newComment: '',
-      photoData: { ...this.photo } // Initialize local state with prop data
+      photoData: { ...this.photo }, // Initialize local state with prop data
+      isLiked: this.photo.isLiked // Initialize isLiked based on prop data if available
     };
   },
   computed: {
