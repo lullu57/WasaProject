@@ -144,7 +144,9 @@ func handleDeletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 	ctx.Logger.Infof("Photo %s deleted by %s", photoID, ctx.User.Username)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Photo deleted successfully"))
+	if _, err := w.Write([]byte("Photo deleted successfully")); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

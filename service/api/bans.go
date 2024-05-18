@@ -23,7 +23,9 @@ func handleBanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params,
 	}
 	ctx.Logger.Infof("User %s banned by %s", userId, ctx.User.Username)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User successfully banned"))
+	if _, err := w.Write([]byte("User successfully banned")); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 // Handler for unbanning a user
@@ -39,15 +41,17 @@ func handleUnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	// Fetch user IDs by username
 	bannerUser := ctx.User.ID
 
-	var err = ctx.Database.UnbanUser(bannerUser, userId)
+	err := ctx.Database.UnbanUser(bannerUser, userId)
 	if err != nil {
-		ctx.Logger.Infof("Internal server error " + err.Error())
+		ctx.Logger.Infof("Internal server error: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 	ctx.Logger.Infof("User %s unbanned by %s", userId, ctx.User.Username)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User successfully unbanned"))
+	if _, err := w.Write([]byte("User successfully unbanned")); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 // Handler for getting all banned users

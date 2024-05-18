@@ -30,6 +30,7 @@ func handleCommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	comment := database.Comment{
 		ID:        uuid.Must(uuid.NewV4()).String(), // Using a UUID library to generate the comment ID
@@ -46,7 +47,9 @@ func handleCommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 	ctx.Logger.Infof("Comment added by %s", ctx.User.Username)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Comment added successfully"))
+	if _, err := w.Write([]byte("Comment added successfully")); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func handleUncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -63,7 +66,9 @@ func handleUncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.
 	}
 	ctx.Logger.Infof("Comment deleted by %s", ctx.User.Username)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Comment deleted successfully"))
+	if _, err := w.Write([]byte("Comment deleted successfully")); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func handleGetComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

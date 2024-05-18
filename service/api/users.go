@@ -35,8 +35,11 @@ func HandleAddUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params,
 	responseMessage := "User created successfully."
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(responseMessage))
+	if _, err := w.Write([]byte(responseMessage)); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
+
 func HandleSetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Parse the request body to get the new username
 	var reqBody struct {

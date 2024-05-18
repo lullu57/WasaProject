@@ -29,22 +29,22 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/photos/:photoId", rt.wrap(handleDeletePhoto))
 	rt.router.GET("/stream", rt.wrap(handleGetMyStream))
 
-	//likes routes
+	// likes routes
 	rt.router.GET("/photos/:photoId/likes", rt.wrap(HandleIsLiked))
 	rt.router.POST("/photos/:photoId/likes", rt.wrap(HandleLikePhoto))
 	rt.router.DELETE("/photos/:photoId/likes", rt.wrap(HandleUnlikePhoto))
 
-	//comments
+	// Comments routes
 	rt.router.POST("/photos/:photoId/comments", rt.wrap(handleCommentPhoto))
 	rt.router.GET("/photos/:photoId/comment", rt.wrap(handleGetComments))
 	rt.router.DELETE("/comments/:commentId", rt.wrap(handleUncommentPhoto))
 
-	//follow routes
+	// follow routes
 	rt.router.GET("/follows/:userId", rt.wrap(handleIsUserFollowed))
 	rt.router.DELETE("/users/:userId/follows", rt.wrap(HandleUnfollowUser))
 	rt.router.POST("/users/:userId/follows", rt.wrap(HandleFollowUser))
 
-	//ban routes
+	// ban routes
 	rt.router.GET("/bans/:userId", rt.wrap(handleIsUserBanned))
 	rt.router.DELETE("/users/:userId/bans", rt.wrap(handleUnbanUser))
 	rt.router.POST("/users/:userId/bans", rt.wrap(handleBanUser))
