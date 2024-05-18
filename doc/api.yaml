@@ -169,7 +169,7 @@ paths:
       tags: [user]
       summary: Get User Profile
       description: Get the profile of a user.
-      operationId: getUserProfile
+      operationId: GetUserProfileID
       responses:
         '200':
           description: User profile retrieved successfully
