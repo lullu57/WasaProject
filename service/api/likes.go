@@ -33,25 +33,11 @@ func HandleLikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 
 // HandleUnlikePhoto processes the request to unlike a photo
 func HandleUnlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Use a map to hold the JSON payload for simplicity
-	var data map[string]string
-
-	// Decode the JSON body into the map
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-
+	photoID := ps.ByName("photoId") // Assuming you're using httprouter and path parameter named "photoId"
 	userID := ctx.User.ID
-	photoID, ok := data["photoId"]
-	if !ok {
-		http.Error(w, "Photo ID is required", http.StatusBadRequest)
-		return
-	}
 
 	// Log the action
-	ctx.Logger.Info("Unliking photo", "userID", userID, "photoID", photoID)
+	ctx.Logger.Info("Unliking photo ", " userID ", userID, " photoID ", photoID)
 
 	// Call UnlikePhoto method of the database object
 	err := ctx.Database.UnlikePhoto(userID, photoID)
