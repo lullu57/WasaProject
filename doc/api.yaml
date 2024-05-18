@@ -445,11 +445,15 @@ paths:
 
   /photos/{photoId}/likes:
     parameters:
-      - name: photoId
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/photoId'
+    - name: photoId
+      in: path
+      required: true
+      description: The unique identifier of the photo.
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9]+$"
+        minLength: 1
+        maxLength: 50
     get:
       tags: [like]
       summary: Get Like
@@ -494,6 +498,34 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
+
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+  /users/{userId}/username:
+    parameters:
+    - name: userId
+      in: path
+      required: true
+      description: The unique identifier of the user.
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9]+$"
+        minLength: 1
+        maxLength: 50
+    get:
+      tags: [user]
+      summary: Get User usernae
+      description: Get the username of a user.
+      operationId: getUsername
+      responses:
+        '201':
+          description: Username retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -547,23 +579,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
-    get:
-      tags: [user]
-      summary: Get User usernae
-      description: Get the username of a user.
-      operationId: getUsername
-      responses:
-        '200':
-          description: Username retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
-      
   /follows/{userId}: 
     parameters:
       - name: userId

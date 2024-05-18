@@ -3,11 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/ardanlabs/conf"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 	"time"
+
+	"github.com/ardanlabs/conf"
+	"gopkg.in/yaml.v2"
 )
 
 // WebAPIConfiguration describes the web API configuration. This structure is automatically parsed by
@@ -54,7 +55,7 @@ func loadConfiguration() (WebAPIConfiguration, error) {
 	fp, err := os.Open(cfg.Config.Path)
 	if err != nil && !os.IsNotExist(err) {
 		return cfg, fmt.Errorf("can't read the config file, while it exists: %w", err)
-	} else if err == nil {
+	} else if err != nil {
 		yamlFile, err := io.ReadAll(fp)
 		if err != nil {
 			return cfg, fmt.Errorf("can't read config file: %w", err)

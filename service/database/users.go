@@ -5,6 +5,7 @@ package database
 import (
 	"crypto/rand"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -108,10 +109,13 @@ func (db *appdbimpl) SetUsername(userId, newUsername string) error {
 func (db *appdbimpl) GetUserByUsername(username string) (*User, error) {
 	var user User
 	err := db.c.QueryRow("SELECT user_id, username FROM users WHERE username = ?", username).Scan(&user.ID, &user.Username)
-	if err == sql.ErrNoRows {
-		return nil, nil // User not found is not an error here
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // User not found is not an error here
+		}
+		return nil, err
 	}
-	return &user, err
+	return &user, nil
 }
 
 func (db *appdbimpl) GetUserProfile(username string) (*User, error) {
@@ -120,7 +124,7 @@ func (db *appdbimpl) GetUserProfile(username string) (*User, error) {
 	// Fetch basic user info
 	err := db.c.QueryRow("SELECT user_id, username FROM users WHERE username = ?", username).Scan(&user.ID, &user.Username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("query error: %w", err)
@@ -176,7 +180,7 @@ func (db *appdbimpl) GetUserProfileByID(userID string) (*User, error) {
 	var user User
 	err := db.c.QueryRow("SELECT user_id, username FROM users WHERE user_id = ?", userID).Scan(&user.ID, &user.Username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("query error: %w", err)
@@ -246,7 +250,7 @@ func (db *appdbimpl) GetUserIDByUsername(username string) (string, error) {
 	var userID string
 	err := db.c.QueryRow("SELECT user_id FROM users WHERE username = ?", username).Scan(&userID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("user not found")
 		}
 		return "", fmt.Errorf("query error: %w", err)
