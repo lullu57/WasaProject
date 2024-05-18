@@ -164,7 +164,8 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/User'
+            type: string
+            description: The unique identifier of the user.
     get:
       tags: [user]
       summary: Get User Profile
