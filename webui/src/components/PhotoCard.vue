@@ -69,6 +69,8 @@ export default {
       };
       try {
         console.log('Toggling like for photo', this.photoData.photoId);
+        console.log('Current isLiked: ', this.isLiked);
+        console.log('User: ', this.userId);
         if (!this.isLiked) {
           const response = await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);
           console.log('Like response:', response.status);
