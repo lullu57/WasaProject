@@ -24,6 +24,7 @@
       v-for="photo in detailedPhotos"
         :key="photo.photoId"
         :photo="photo"
+        :user-id="localStorageUserId"
         @photoDeleted="handlePhotoDeleted"
       />
     </div>

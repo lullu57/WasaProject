@@ -29,20 +29,16 @@ import api from '@/services/axios';
 
 export default {
   props: {
-    photo: Object
+    photo: Object,
+    userId: String // Add userId as a prop
   },
   data() {
     return {
       showComments: true,
       newComment: '',
       photoData: { ...this.photo }, // Initialize local state with prop data
-      isLiked: this.photo.isLiked // Initialize isLiked based on prop data if available
+      isLiked: false // Initialize isLiked based on prop data if available
     };
-  },
-  computed: {
-    userId() {
-      return localStorage.getItem('userId'); // Access localStorage once and use it reactively
-    }
   },
   mounted() {
     this.checkIfLiked();
