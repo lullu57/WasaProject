@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"log"
 )
 
 // AddPhoto stores metadata about a photo in the database.
@@ -47,28 +48,39 @@ func (db *appdbimpl) DeletePhoto(photoID string) error {
 		return err
 	}
 
+	// Defer a rollback in case anything fails. The rollback
+	// will only be attempted if the transaction has not been committed.
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("tx.Rollback failed: %v", rbErr)
+			}
+		}
+	}()
+
 	// Delete comments
-	_, err = tx.Exec("DELETE FROM comments WHERE photo_id = ?", photoID)
-	if err != nil {
-		tx.Rollback()
+	if _, err = tx.Exec("DELETE FROM comments WHERE photo_id = ?", photoID); err != nil {
 		return err
 	}
 
 	// Delete likes
-	_, err = tx.Exec("DELETE FROM likes WHERE photo_id = ?", photoID)
-	if err != nil {
-		tx.Rollback()
+	if _, err = tx.Exec("DELETE FROM likes WHERE photo_id = ?", photoID); err != nil {
 		return err
 	}
 
 	// Delete the photo
-	_, err = tx.Exec("DELETE FROM new_photos WHERE photo_id = ?", photoID)
-	if err != nil {
-		tx.Rollback()
+	if _, err = tx.Exec("DELETE FROM new_photos WHERE photo_id = ?", photoID); err != nil {
 		return err
 	}
 
-	return tx.Commit()
+	// Attempt to commit the transaction.
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	// If commit is successful, set err to nil so that the deferred rollback is not executed.
+	err = nil
+	return nil
 }
 
 func (db *appdbimpl) GetMyStream(userID string) ([]string, error) {
