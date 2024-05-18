@@ -39,6 +39,10 @@ func (db *appdbimpl) GetPhotos() ([]Photo, error) {
 		photos = append(photos, photo)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
 	return photos, nil
 }
 
@@ -94,17 +98,22 @@ func (db *appdbimpl) GetMyStream(userID string) ([]string, error) {
     `
 	rows, err := db.c.Query(query, userID, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query my stream: %w", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var photoId string
 		if err := rows.Scan(&photoId); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to scan photo ID: %w", err)
 		}
 		photoIds = append(photoIds, photoId)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
 	return photoIds, nil
 }
 

@@ -65,6 +65,11 @@ func (db *appdbimpl) GetBans() ([]Ban, error) {
 		bans = append(bans, ban)
 	}
 
+	// Check for errors that may have occurred during iteration
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
 	return bans, nil
 }
 

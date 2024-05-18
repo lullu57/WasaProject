@@ -92,5 +92,7 @@ func handleIsUserBanned(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 	response := map[string]bool{"banned": banned}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }

@@ -127,7 +127,9 @@ func handleGetMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 	ctx.Logger.Info("My stream fetched")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(photos)
+	if err := json.NewEncoder(w).Encode(photos); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func handleDeletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -177,7 +179,7 @@ func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		Timestamp  string             `json:"timestamp"`
 		ImageData  string             `json:"imageData"`
 		LikesCount int                `json:"likesCount"`
-		Comments   []database.Comment `json:"comments"` // Using fully qualified type name
+		Comments   []database.Comment `json:"comments"`
 	}{
 		PhotoID:    photo.PhotoID,
 		UserID:     photo.UserID,
@@ -189,5 +191,7 @@ func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }

@@ -254,7 +254,6 @@ func (db *appdbimpl) GetUserIDByUsername(username string) (string, error) {
 	return userID, nil
 }
 
-// getAllUsers
 func (db *appdbimpl) GetAllUsers() ([]User, error) {
 	rows, err := db.c.Query("SELECT user_id, username FROM users")
 	if err != nil {
@@ -270,6 +269,10 @@ func (db *appdbimpl) GetAllUsers() ([]User, error) {
 			return nil, fmt.Errorf("failed to scan user: %w", err)
 		}
 		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
 	}
 
 	return users, nil
@@ -291,6 +294,11 @@ func (db *appdbimpl) GetFollowersByUsername(username string) ([]string, error) {
 		}
 		followers = append(followers, followerID)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
 	return followers, nil
 }
 

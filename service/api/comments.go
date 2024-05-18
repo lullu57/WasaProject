@@ -85,5 +85,7 @@ func handleGetComments(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 	ctx.Logger.Infof("Comments fetched")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(comments)
+	if err := json.NewEncoder(w).Encode(comments); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }

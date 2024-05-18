@@ -69,11 +69,13 @@ func HandleSetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Username updated successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Username updated successfully"}); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func HandleGetUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	username := ps.ByName("username") // Assuming username is the URL parameter
+	username := ps.ByName("username")
 
 	ctx.Logger.Info("Retrieving user profile for username: ", username)
 	user, err := ctx.Database.GetUserProfile(username)
@@ -85,11 +87,13 @@ func HandleGetUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func HandleGetUserProfileID(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	userID := ps.ByName("userId") // Assuming userID is the URL parameter
+	userID := ps.ByName("userId")
 
 	ctx.Logger.Info("Retrieving user profile for userID: ", userID)
 	user, err := ctx.Database.GetUserProfileByID(userID)
@@ -101,7 +105,9 @@ func HandleGetUserProfileID(w http.ResponseWriter, r *http.Request, ps httproute
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -155,11 +161,11 @@ func doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx r
 }
 
 func HandleFollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	userId := ps.ByName("userId") // Extracting username from URL parameter
+	userId := ps.ByName("userId")
 
 	followerID := ctx.User.ID
 
-	var err = ctx.Database.FollowUser(followerID, userId)
+	err := ctx.Database.FollowUser(followerID, userId)
 	if err != nil {
 		ctx.Logger.Errorf("Error following user: %v", err)
 		http.Error(w, "Failed to follow user", http.StatusInternalServerError)
@@ -168,16 +174,18 @@ func HandleFollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	ctx.Logger.Infof("User %s followed %s", ctx.User.Username, userId)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "User Followed successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "User Followed successfully"}); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func HandleUnfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	userId := ps.ByName("userId") // Extracting username from URL parameter
+	userId := ps.ByName("userId")
 
 	ctx.Logger.Infof("Unfollowing user: %s", userId)
 
 	followerID := ctx.User.ID
-	var err = ctx.Database.UnfollowUser(followerID, userId)
+	err := ctx.Database.UnfollowUser(followerID, userId)
 	if err != nil {
 		ctx.Logger.Errorf("Error unfollowing user: %v", err)
 		http.Error(w, "Failed to unfollow user", http.StatusInternalServerError)
@@ -186,7 +194,9 @@ func HandleUnfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	ctx.Logger.Infof("User %s unfollowed %s", ctx.User.Username, userId)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "User Unfollowed successfully"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "User Unfollowed successfully"}); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 // get all users
@@ -200,7 +210,9 @@ func HandleGetAllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	ctx.Logger.Infof("Fetched all users")
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 /*
@@ -239,7 +251,9 @@ func handleGetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	ctx.Logger.Infof("Username fetched for userID: %s", userId)
 	response := map[string]string{"username": username}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
 
 func handleIsUserFollowed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -255,5 +269,7 @@ func handleIsUserFollowed(w http.ResponseWriter, r *http.Request, ps httprouter.
 	ctx.Logger.Infof("User follow status checked")
 	response := map[string]bool{"isFollowed": isFollowed}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
 }
