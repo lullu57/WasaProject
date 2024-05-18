@@ -32,7 +32,7 @@ func (db *appdbimpl) UnlikePhoto(userID string, photoID string) error {
 	return nil
 }
 
-func (db *appdbimpl) IsLiked(photoID string, userID string) (bool, error) {
+func (db *appdbimpl) IsLiked(userID string, photoID string) (bool, error) {
 	var exists bool
 	err := db.c.QueryRow("SELECT EXISTS(SELECT 1 FROM likes WHERE user_id = ? AND photo_id = ?)", userID, photoID).Scan(&exists)
 	if err != nil {

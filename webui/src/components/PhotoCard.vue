@@ -37,7 +37,7 @@ export default {
       showComments: true,
       newComment: '',
       photoData: { ...this.photo }, // Initialize local state with prop data
-      isLiked: false // Initialize isLiked based on prop data if available
+      isLiked: false
     };
   },
   mounted() {
@@ -54,8 +54,9 @@ export default {
         console.log('Checking like status for photo', this.photoData.photoId);
         const response = await api.get(`/photos/${this.photoData.photoId}/likes`, config);
         this.isLiked = response.data.liked;
+       
         console.log('Is liked:', this.isLiked);
-        console.log('Likes count:', response.data.likesCount);
+        console.log('Likes count:', this.photoData.likesCount);
         console.log('User ID:', this.userId)
       } catch (error) {
         console.error('Failed to check like status', error);
