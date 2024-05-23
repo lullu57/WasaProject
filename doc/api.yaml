@@ -111,7 +111,7 @@ paths:
                    allOf:
                     - $ref: '#/components/schemas/Photo'
                     - minItems: 0
-                      maxItems: 100
+                    - maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
@@ -141,36 +141,6 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
-
-  # /users/followers/{username}:
-  #   parameters:
-  #       - name: username
-  #         in: path
-  #         required: true
-  #         schema:
-  #           $ref: '#/components/schemas/username'
-  #   get:
-  #     tags: [user]
-  #     summary: Get Followers
-  #     description: Get the followers of a user.
-  #     operationId: getFollowers
-  #     responses:
-  #       '200':
-  #         description: Followers retrieved successfully
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                  allOf:
-  #                   - $ref: '#/components/schemas/Photo'
-  #                   - minItems: 0
-  #                     maxItems: 100
-
-  #       "400": { $ref: "#/components/responses/BadRequest" }
-  #       "401": { $ref: "#/components/responses/Unauthorized" }
-  #       "500": { $ref: "#/components/responses/ServerError" }
-
 
   /users/{userId}/follows:
     parameters:
@@ -277,7 +247,7 @@ paths:
                    allOf:
                     - $ref: '#/components/schemas/User'
                     - minItems: 0
-                      maxItems: 100
+                    - maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -353,7 +323,7 @@ paths:
                    allOf:
                     - $ref: '#/components/schemas/Comment'
                     - minItems: 0
-                      maxItems: 100
+                    - maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -616,95 +586,90 @@ components:
     ServerError: 
       description: Error Code 500
   schemas:
-    Success: 
+    Success:
       type: string
       minLength: 1
       maxLength: 100
-      pattern: '^[a-zA-Z0-9]$'
+      pattern: '^[a-zA-Z0-9]+$'
       description: A message indicating the success of an operation
     Comment:
       type: object
-      description: "A comment object representing a user's comment on a photo"
+      description: A comment object representing a user's comment on a photo
       properties:
         content:
           type: string
           minLength: 1
           maxLength: 150
-          pattern: '^[a-zA-Z0-9]$'
-          description: The Content of the comment
-        photoId: 
+          pattern: '^[a-zA-Z0-9]+$'
+          description: The content of the comment
+        photoId:
           type: string
           minLength: 10
           maxLength: 20
-          pattern: '^[a-zA-Z0-9]$'
-          description: The identifier of a photo
+          pattern: '^[a-zA-Z0-9]+$'
+          description: The identifier of the photo being commented on
         userId:
           type: string
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the commentor
+          description: The identifier of the user who made the comment
         commentId:
           type: string
           minLength: 10
           maxLength: 20
-          pattern: '^[a-zA-Z0-9]$'
-          description: The identifier of a comment
+          pattern: '^[a-zA-Z0-9]+$'
+          description: The unique identifier of the comment
     Photo:
       type: object
-      description: "A photo object representing a user's photo"
+      description: A photo object representing a user's photo
       properties:
         photoId:
           type: string
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
-          description: The unique identifier of the photo.
+          description: The unique identifier of the photo
         userId:
           type: string
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
-          description: The identifier of the user who uploaded the photo.
+          description: The identifier of the user who uploaded the photo
         uploadTime:
           type: string
           format: date-time
-          description: The timestamp of when the photo was uploaded.
+          description: The timestamp of when the photo was uploaded
         likes:
           type: array
           items:
             $ref: '#/components/schemas/Like'
-          description: An array of likes associated with the photo.
+          description: An array of likes associated with the photo
         comments:
           type: array
           items:
             $ref: '#/components/schemas/Comment'
-          description: An array of comments associated with the photo.
-      
+          description: An array of comments associated with the photo
     Like:
       type: object
-      description: Represents a like made by a user to a photo.
+      description: Represents a like made by a user to a photo
       properties:
         userId:
           type: string
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the user who liked the photo.
+          description: The identifier of the user who liked the photo
         photoId:
           type: string
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the photo being liked.
+          description: The identifier of the photo being liked
         timestamp:
           type: string
           format: date-time
-          description: Timestamp of when the like was made.
-      required:
-        - userId
-        - photoId
-
+          description: The timestamp of when the like was made
     username:
       type: string
       minLength: 10
@@ -722,10 +687,10 @@ components:
       minLength: 10
       maxLength: 20
       pattern: "^[a-zA-Z0-9_]{10,20}$"
-      description: "The unique identifier of the photo."
-    User: 
+      description: The unique identifier of the photo
+    User:
       type: object
-      description: Represents a user, including information about their followers, who they're following, and their photos.
+      description: Represents a user, including information about their followers, who they're following, and their photos
       properties:
         userId:
           type: string
@@ -743,35 +708,33 @@ components:
           type: array
           items:
             type: string
-            description: Unique identifier of a follower.
+            description: Unique identifier of a follower
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the user's followers.
+          description: An array of unique identifiers for the user's followers
         following:
           type: array
           items:
             type: string
-            description: Unique identifier of a followed user.
+            description: Unique identifier of a followed user
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the users being followed by the user.
+          description: An array of unique identifiers for the users being followed by the user
         photos:
           type: array
           items:
             type: string
-            description: Unique identifier of a photo uploaded by the user.
+            description: Unique identifier of a photo uploaded by the user
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the photos uploaded by the user.
+          description: An array of unique identifiers for the photos uploaded by the user
       required:
         - userId
         - username
 
-
-    
   securitySchemes:
     BearerAuth:
       type: http
