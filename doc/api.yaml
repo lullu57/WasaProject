@@ -33,7 +33,7 @@ paths:
                 name:
                   type: string 
                   example: Maria 
-                  pattern: 'ˆ.*?$' 
+                  pattern: '^.*?$' 
                   minLength: 3 
                   maxLength: 16
         required: true
@@ -95,10 +95,12 @@ paths:
                     type: string
                     example: "Username already exists"
 
+
   /stream:
     get:
       tags: [photo]
       summary: Returns the user's stream
+      description: Returns the user's stream, which is a list of photos uploaded by the users they follow.
       operationId: getMyStream
       responses:
         '201':
@@ -108,10 +110,9 @@ paths:
               schema:
                 type: array
                 items:
-                   allOf:
-                    - $ref: '#/components/schemas/Photo'
-                    - minItems: 0
-                    - maxItems: 100
+                  $ref: '#/components/schemas/Photo'
+                minItems: 0
+                maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "500": { $ref: "#/components/responses/ServerError" }
@@ -125,11 +126,13 @@ paths:
             type: string
             description: The unique identifier of the user.
             pattern: "^[a-zA-Z0-9]+$"
+            minLength: 1
+            maxLength: 50
     get:
       tags: [user]
       summary: Get User Profile
       description: Get the profile of a user.
-      operationId: GetUserProfileID
+      operationId: GetUserProfile
       responses:
         '200':
           description: User profile retrieved successfully
@@ -197,6 +200,8 @@ paths:
           type: string
           pattern: "^[a-zA-Z0-9]+$"
           description: The unique identifier of the user to ban or unban.
+          minLength: 1
+          maxLength: 50
     post:
       tags: [user]
       summary: Ban User
@@ -244,10 +249,9 @@ paths:
               schema:
                 type: array
                 items:
-                   allOf:
-                    - $ref: '#/components/schemas/User'
-                    - minItems: 0
-                    - maxItems: 100
+                    $ref: '#/components/schemas/User'
+                minItems: 0
+                maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -320,10 +324,9 @@ paths:
               schema:
                 type: array
                 items:
-                   allOf:
-                    - $ref: '#/components/schemas/Comment'
-                    - minItems: 0
-                    - maxItems: 100
+                  $ref: '#/components/schemas/Comment'
+                minItems: 0
+                maxItems: 100
 
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -366,6 +369,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Photo'
+                minItems: 0
+                maxItems: 100
+
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -443,7 +449,7 @@ paths:
       tags: [like]
       summary: Add Photo
       description: Add a like to a photo.
-      operationId: AddLike
+      operationId: likePhoto
       responses:
         '201':
           description: action successful
@@ -460,7 +466,7 @@ paths:
       tags: [like]
       summary: Remove Like
       description: Remove a like from a photo.
-      operationId: RemloveLike
+      operationId: unlikePhoto
       responses:
         '201':
           description: action successful
@@ -544,6 +550,7 @@ paths:
       - name: userId
         in: path
         required: true
+        description: The unique identifier of the user to follow or unfollow.
         schema:
           $ref: '#/components/schemas/User'
     get:
@@ -563,6 +570,7 @@ paths:
       - name: userId
         in: path
         required: true
+        description: The unique identifier of the user to ban or unban.
         schema:
           $ref: '#/components/schemas/User'
     get:
@@ -583,59 +591,59 @@ components:
       description: Error Code 400
     Unauthorized:
       description: Error Code 401
-    ServerError: 
+    ServerError:
       description: Error Code 500
   schemas:
     Success:
       type: string
+      description: A message indicating the success of an operation
       minLength: 1
       maxLength: 100
       pattern: '^[a-zA-Z0-9]+$'
-      description: A message indicating the success of an operation
     Comment:
       type: object
       description: A comment object representing a user's comment on a photo
       properties:
         content:
           type: string
+          description: The content of the comment
           minLength: 1
           maxLength: 150
           pattern: '^[a-zA-Z0-9]+$'
-          description: The content of the comment
         photoId:
           type: string
+          description: The identifier of the photo being commented on
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9]+$'
-          description: The identifier of the photo being commented on
         userId:
           type: string
+          description: The identifier of the user who made the comment
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the user who made the comment
         commentId:
           type: string
+          description: The unique identifier of the comment
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9]+$'
-          description: The unique identifier of the comment
     Photo:
       type: object
       description: A photo object representing a user's photo
       properties:
         photoId:
           type: string
+          description: The unique identifier of the photo
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
-          description: The unique identifier of the photo
         userId:
           type: string
+          description: The identifier of the user who uploaded the photo
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
-          description: The identifier of the user who uploaded the photo
         uploadTime:
           type: string
           format: date-time
@@ -645,37 +653,35 @@ components:
           items:
             $ref: '#/components/schemas/Like'
           description: An array of likes associated with the photo
+          minItems: 0
+          maxItems: 100
         comments:
           type: array
           items:
             $ref: '#/components/schemas/Comment'
           description: An array of comments associated with the photo
+          minItems: 0
+          maxItems: 100
     Like:
       type: object
       description: Represents a like made by a user to a photo
       properties:
         userId:
           type: string
+          description: The identifier of the user who liked the photo
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the user who liked the photo
         photoId:
           type: string
+          description: The identifier of the photo being liked
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
-          description: The identifier of the photo being liked
         timestamp:
           type: string
           format: date-time
           description: The timestamp of when the like was made
-    username:
-      type: string
-      minLength: 10
-      maxLength: 20
-      pattern: "^[a-zA-Z0-9_]+$"
-      description: A unique user identifier
     commentId:
       type: string
       minLength: 10
@@ -694,16 +700,16 @@ components:
       properties:
         userId:
           type: string
+          description: A unique user identifier
           minLength: 10
           maxLength: 20
           pattern: "^[a-zA-Z0-9_]+$"
-          description: A unique user identifier
         username:
           type: string
+          description: The user's username
           minLength: 3
           maxLength: 50
           pattern: "^[a-zA-Z0-9_]+$"
-          description: The user's username
         followers:
           type: array
           items:
@@ -713,6 +719,8 @@ components:
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
           description: An array of unique identifiers for the user's followers
+          minItems: 0
+          maxItems: 100
         following:
           type: array
           items:
@@ -722,6 +730,8 @@ components:
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
           description: An array of unique identifiers for the users being followed by the user
+          minItems: 0
+          maxItems: 100
         photos:
           type: array
           items:
@@ -731,6 +741,8 @@ components:
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
           description: An array of unique identifiers for the photos uploaded by the user
+          minItems: 0
+          maxItems: 100
       required:
         - userId
         - username
