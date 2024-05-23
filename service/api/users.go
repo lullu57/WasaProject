@@ -62,8 +62,12 @@ func HandleSetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	ctx.Logger.Info("Setting new username for user ID: ", currentUserID)
 	err = ctx.Database.SetUsername(currentUserID, reqBody.NewUsername)
 	if err != nil {
-		ctx.Logger.Error("Failed to update username: ", err)
-		http.Error(w, "Failed to update username", http.StatusInternalServerError)
+		if err.Error() == "username already taken" {
+			http.Error(w, "Username already taken", http.StatusConflict)
+		} else {
+			ctx.Logger.Error("Failed to update username: ", err)
+			http.Error(w, "Failed to update username", http.StatusInternalServerError)
+		}
 		return
 	}
 

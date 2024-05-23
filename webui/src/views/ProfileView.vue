@@ -146,9 +146,14 @@ const changeUsername = async () => {
     alert('Username changed successfully!');
   } catch (error) {
     console.error("Error changing username:", error);
-    alert('Failed to change username.');
+    if (error.response && error.response.status === 409) {
+      alert('Username already taken. Please choose another one.');
+    } else {
+      alert('Failed to change username.');
+    }
   }
 };
+
 
 const handlePhotoDeleted = (photoId) => {
   detailedPhotos.value = detailedPhotos.value.filter(photo => photo.photoId !== photoId);

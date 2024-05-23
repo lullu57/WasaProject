@@ -91,16 +91,22 @@ func (db *appdbimpl) AddUser(user *User) error {
 	return nil
 }
 
-func (db *appdbimpl) SetUsername(userId, newUsername string) error {
-	stmt, err := db.c.Prepare("UPDATE users SET username = ? WHERE user_id = ?")
-	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %w", err)
+func (db *appdbimpl) SetUsername(userID, newUsername string) error {
+	// Check if the username already exists (case-insensitive)
+	var existingID string
+	err := db.c.QueryRow(`SELECT user_id FROM users WHERE username ILIKE $1`, newUsername).Scan(&existingID)
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("failed to check existing username: %w", err)
 	}
-	defer stmt.Close()
 
-	_, err = stmt.Exec(newUsername, userId)
+	if existingID != "" {
+		return fmt.Errorf("username already taken")
+	}
+
+	// Update the username if it's not taken
+	_, err = db.c.Exec(`UPDATE users SET username = $1 WHERE user_id = $2`, newUsername, userID)
 	if err != nil {
-		return fmt.Errorf("failed to execute statement: %w", err)
+		return fmt.Errorf("failed to update username: %w", err)
 	}
 
 	return nil
