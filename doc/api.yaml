@@ -538,16 +538,6 @@ paths:
       summary: Set My User Name
       description: Set the user's username.
       operationId: setMyUserName
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[a-zA-Z0-9]+$"
-            minLength: 1
-            maxLength: 50
-          description: The current user ID.
       requestBody:
         description: New username to set for the user
         required: true
