@@ -35,14 +35,13 @@ func (db *appdbimpl) GetCommentsByPhotoId(photoId string) ([]Comment, error) {
 	var comments []Comment
 	for rows.Next() {
 		var c Comment
-		err := rows.Scan(&c.ID, &c.UserID, &c.PhotoID, &c.Content, &c.Timestamp)
-		if err != nil {
+		if err := rows.Scan(&c.ID, &c.UserID, &c.PhotoID, &c.Content, &c.Timestamp); err != nil {
 			return nil, fmt.Errorf("failed to scan comment: %w", err)
 		}
 		comments = append(comments, c)
 	}
 
-	// Check for errors from iterating over rows
+	// Check for errors that may have occurred during iteration
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("iteration error: %w", err)
 	}

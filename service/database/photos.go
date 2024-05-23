@@ -32,13 +32,13 @@ func (db *appdbimpl) GetPhotos() ([]Photo, error) {
 	var photos []Photo
 	for rows.Next() {
 		var photo Photo
-		err = rows.Scan(&photo.ID, &photo.UserID, &photo.ImageData, &photo.Timestamp)
-		if err != nil {
+		if err := rows.Scan(&photo.ID, &photo.UserID, &photo.ImageData, &photo.Timestamp); err != nil {
 			return nil, fmt.Errorf("failed to scan photo: %w", err)
 		}
 		photos = append(photos, photo)
 	}
 
+	// Check for errors that may have occurred during iteration
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows error: %w", err)
 	}

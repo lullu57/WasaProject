@@ -58,8 +58,7 @@ func (db *appdbimpl) GetBans() ([]Ban, error) {
 	var bans []Ban
 	for rows.Next() {
 		var ban Ban
-		err = rows.Scan(&ban.ID, &ban.BannedBy, &ban.BannedUser, &ban.Timestamp)
-		if err != nil {
+		if err := rows.Scan(&ban.ID, &ban.BannedBy, &ban.BannedUser, &ban.Timestamp); err != nil {
 			return nil, fmt.Errorf("failed to scan ban: %w", err)
 		}
 		bans = append(bans, ban)

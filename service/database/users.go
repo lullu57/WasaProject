@@ -268,13 +268,13 @@ func (db *appdbimpl) GetAllUsers() ([]User, error) {
 	var users []User
 	for rows.Next() {
 		var user User
-		err = rows.Scan(&user.ID, &user.Username)
-		if err != nil {
+		if err := rows.Scan(&user.ID, &user.Username); err != nil {
 			return nil, fmt.Errorf("failed to scan user: %w", err)
 		}
 		users = append(users, user)
 	}
 
+	// Check for errors that may have occurred during iteration
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows error: %w", err)
 	}
