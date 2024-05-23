@@ -114,7 +114,7 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 
 func (db *appdbimpl) GetUserByUsername(username string) (*User, error) {
 	var user User
-	err := db.c.QueryRow("SELECT user_id, username FROM users WHERE username = ?", username).Scan(&user.ID, &user.Username)
+	err := db.c.QueryRow("SELECT user_id, username FROM users WHERE username ILIKE $1", username).Scan(&user.ID, &user.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil // User not found is not an error here
