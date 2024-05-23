@@ -3,7 +3,7 @@
       <h2>Discover Users</h2>
       <ul class="user-list">
         <li v-for="user in users" :key="user.userId">
-          <router-link :to="{ name: 'Profile', params: { userId: user.userId } }">
+          <router-link :to="{ name: 'Profile', params: { profileId: user.userId } }">
             {{ user.username }}
           </router-link>
           <button @click="toggleFollow(user)" :disabled="user.processing">
