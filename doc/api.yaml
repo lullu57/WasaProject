@@ -235,28 +235,6 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /bans:
-    get:
-      tags: [user]
-      summary: Get Banned Users
-      description: Get the list of banned users.
-      operationId: getBannedUsers
-      responses:
-        '200':
-          description: Banned users retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                    $ref: '#/components/schemas/User'
-                minItems: 0
-                maxItems: 100
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
-
   /comments/{commentId}: 
     parameters:
       - name: commentId
