@@ -1,6 +1,6 @@
 package database
 
-//All User related methods are defined here
+// All User related methods are defined here
 
 import (
 	"crypto/rand"

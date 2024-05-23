@@ -19,7 +19,7 @@ func (db *appdbimpl) BanUser(bannedBy, bannedUser string) error {
 		return fmt.Errorf("failed to prepare ban statement: %w", err)
 	}
 	defer stmt.Close()
-	//generate a unique ban id
+	// generate a unique ban id
 	banId, err := generateRandomString(10)
 	if err != nil {
 		return fmt.Errorf("failed to generate ban id: %w", err)
