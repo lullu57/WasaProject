@@ -94,7 +94,7 @@ func (db *appdbimpl) AddUser(user *User) error {
 func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 	// Check if the username already exists (case-insensitive)
 	var existingID string
-	err := db.c.QueryRow(`SELECT user_id FROM users WHERE username ILIKE $1`, newUsername).Scan(&existingID)
+	err := db.c.QueryRow(`SELECT user_id FROM users WHERE username LIKE ? COLLATE NOCASE`, newUsername).Scan(&existingID)
 	if err != nil && err != sql.ErrNoRows {
 		return fmt.Errorf("failed to check existing username: %w", err)
 	}
@@ -114,7 +114,7 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 
 func (db *appdbimpl) GetUserByUsername(username string) (*User, error) {
 	var user User
-	err := db.c.QueryRow(`SELECT user_id, username FROM users WHERE username ILIKE $1`, username).Scan(&user.ID, &user.Username)
+	err := db.c.QueryRow(`SELECT user_id, username FROM users WHERE username LIKE ? COLLATE NOCASE`, username).Scan(&user.ID, &user.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil // User not found is not an error here
