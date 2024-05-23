@@ -264,8 +264,22 @@ func (db *appdbimpl) GetUserIDByUsername(username string) (string, error) {
 	return userID, nil
 }
 
-func (db *appdbimpl) GetAllUsers() ([]User, error) {
-	rows, err := db.c.Query("SELECT user_id, username FROM users")
+func (db *appdbimpl) GetAllUsers(currentUserID string) ([]User, error) {
+	query := `
+		SELECT user_id, username
+		FROM users
+		WHERE user_id NOT IN (
+			SELECT banned_user
+			FROM bans
+			WHERE banned_by = ?
+		)
+		AND user_id NOT IN (
+			SELECT banned_by
+			FROM bans
+			WHERE banned_user = ?
+		)
+	`
+	rows, err := db.c.Query(query, currentUserID, currentUserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query users: %w", err)
 	}

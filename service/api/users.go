@@ -205,7 +205,9 @@ func HandleUnfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 // get all users
 func HandleGetAllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	users, err := ctx.Database.GetAllUsers()
+	currentUserID := ctx.User.ID // Ensure that ctx.User is populated correctly in the middleware
+
+	users, err := ctx.Database.GetAllUsers(currentUserID)
 	if err != nil {
 		ctx.Logger.Errorf("Failed to get all users: %v", err)
 		http.Error(w, "Failed to get all users", http.StatusInternalServerError)
