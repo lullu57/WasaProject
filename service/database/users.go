@@ -270,12 +270,12 @@ func (db *appdbimpl) GetAllUsers(currentUserID string) ([]User, error) {
 		FROM users
 		WHERE user_id NOT IN (
 			SELECT banned_user
-			FROM bans
+			FROM new_bans
 			WHERE banned_by = ?
 		)
 		AND user_id NOT IN (
 			SELECT banned_by
-			FROM bans
+			FROM new_bans
 			WHERE banned_user = ?
 		)
 	`
