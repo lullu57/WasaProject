@@ -57,6 +57,9 @@ const fetchUserProfile = async () => {
     if (!isOwnProfile.value) { // Check if the profile is not the user's own
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
       await checkIfUserIsBanned(); // Check if the user has banned the profile user
+      console.log('isBanned:', isBanned.value);
+      console.log('userProfile:', userProfile.value);
+      console
       if (isBanned.value) {
         // If the user is banned, redirect or handle appropriately
         router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
@@ -109,6 +112,7 @@ const checkIfUserIsBanned = async () => {
         Authorization: `${localStorage.getItem('userId')}`
       }
     })
+    console.log('Banned response:', response.data);
     isBanned.value = response.data.banned; // Ensure this matches the key returned by your API
   } catch (error) {
     console.error("Error checking if user is banned:", error);
