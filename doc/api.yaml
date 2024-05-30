@@ -66,8 +66,9 @@ paths:
   /users:
     post:
       tags: [user]
-      summary: Creates a new user
-      operationId: createUser
+      summary: Adds a new User to users collection
+      description: Adds a new user to the users collection
+      operationId: addUser
       requestBody:
         description: User details
         content:
@@ -119,20 +120,20 @@ paths:
 
   /users/{userId}:
     parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            description: The unique identifier of the user.
-            pattern: "^[a-zA-Z0-9]+$"
-            minLength: 1
-            maxLength: 50
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: The unique identifier of the user.
+        pattern: "^[a-zA-Z0-9]+$"
+        minLength: 1
+        maxLength: 50
     get:
       tags: [user]
       summary: Get User Profile
       description: Get the profile of a user.
-      operationId: GetUserProfile
+      operationId: getUserProfile
       responses:
         '200':
           description: User profile retrieved successfully
@@ -150,17 +151,16 @@ paths:
     - name: userId
       in: path
       required: true
-      description: The unique identifier of the user to follow or unfollow.
       schema:
         type: string
+        description: The unique identifier of the user.
+        pattern: "^[a-zA-Z0-9]+$"
         minLength: 1
         maxLength: 50
-        pattern: "^[a-zA-Z0-9]+$"
-        description: Unique identifier of the user.
     post:
       tags: [user]
       summary: Follow User
-      description: Follow a user.
+      description: Adds a new follow to the user's collection
       operationId: followUser
       responses:
         '201':
@@ -177,7 +177,7 @@ paths:
     delete:
       tags: [user]
       summary: Unfollow User
-      description: Unfollow a user.
+      description: Removes a follow from the user's follows collection
       operationId: unfollowUser
       responses:
         '201':
@@ -193,19 +193,19 @@ paths:
 
   /users/{userId}/bans:
     parameters:
-      - name: userId
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: "^[a-zA-Z0-9]+$"
-          description: The unique identifier of the user to ban or unban.
-          minLength: 1
-          maxLength: 50
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-zA-Z0-9]+$"
+        description: The unique identifier of the user to ban or unban.
+        minLength: 1
+        maxLength: 50
     post:
       tags: [user]
       summary: Ban User
-      description: Ban a user.
+      description: Adds a new ban to the user's bans collection
       operationId: banUser
       responses:
         '201':
@@ -221,7 +221,7 @@ paths:
     delete:
       tags: [user]
       summary: Unban User
-      description: Unban a user.
+      description: Removes a ban from the user's bans collection
       operationId: unbanUser
       responses:
         '201':
@@ -244,8 +244,8 @@ paths:
           $ref: '#/components/schemas/commentId'
     delete:
       tags: [comment]
-      summary: Delete Comment
-      description: Delete a comment.
+      summary: Remove Comment
+      description: Removes a comment.
       operationId: uncommentPhoto
       responses:
         '201':
@@ -268,8 +268,8 @@ paths:
             $ref: '#/components/schemas/photoId'
     post:
       tags: [comment]
-      summary: Comment Photo
-      description: Comment a photo.
+      summary: Add Comment
+      description: Adds a new comment to the photo's comments collection
       operationId: commentPhoto
       requestBody:
         required: true
@@ -367,7 +367,7 @@ paths:
     get:
       tags: [photo]
       summary: Get Photo
-      description: Get a photo.
+      description: Returns a photo.
       operationId: getPhoto
       responses:
         '200':
@@ -382,8 +382,8 @@ paths:
         "500": { $ref: "#/components/responses/ServerError" }
     delete:
       tags: [photo]
-      summary: Delete Photo
-      description: Delete a photo.
+      summary: Remoove Photo
+      description: Removes a photo from the photos collection
       operationId: deletePhoto
       responses:
         '201':
@@ -410,8 +410,8 @@ paths:
         maxLength: 50
     get:
       tags: [like]
-      summary: Get Like
-      description: Get whether a user liked a photo.
+      summary: Checks Like status
+      description: Returns whether a user liked a photo.
       operationId: isLiked
       responses:
         '200':
@@ -425,7 +425,7 @@ paths:
         "500": { $ref: "#/components/responses/ServerError" } 
     post:
       tags: [like]
-      summary: Add Photo
+      summary: Add Photo like
       description: Add a like to a photo.
       operationId: likePhoto
       responses:
@@ -443,7 +443,7 @@ paths:
     delete:
       tags: [like]
       summary: Remove Like
-      description: Remove a like from a photo.
+      description: Removes a like from a photo.
       operationId: unlikePhoto
       responses:
         '201':
@@ -470,7 +470,7 @@ paths:
         maxLength: 50
     get:
       tags: [user]
-      summary: Get User usernae
+      summary: Returns username
       description: Get the username of a user.
       operationId: getUsername
       responses:
@@ -489,7 +489,7 @@ paths:
     patch:
       tags:
         - user
-      summary: Set My User Name
+      summary: Sets Username
       description: Set the user's username.
       operationId: setMyUserName
       requestBody:
@@ -528,9 +528,13 @@ paths:
       - name: userId
         in: path
         required: true
-        description: The unique identifier of the user to follow or unfollow.
         schema:
-          $ref: '#/components/schemas/User'
+          type: string
+          description: The unique identifier of the user.
+          pattern: "^[a-zA-Z0-9]+$"
+          minLength: 1
+          maxLength: 50
+          
     get:
       tags: [user]
       summary: Get if the User Is Followed
@@ -545,12 +549,15 @@ paths:
                 type: boolean
   /bans/{userId}: 
     parameters:
-      - name: userId
-        in: path
-        required: true
-        description: The unique identifier of the user to ban or unban.
-        schema:
-          $ref: '#/components/schemas/User'
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: The unique identifier of the user.
+        pattern: "^[a-zA-Z0-9]+$"
+        minLength: 1
+        maxLength: 50
     get:
       tags: [user]
       summary: Get if the User Is Banned
@@ -574,117 +581,123 @@ components:
   schemas:
     Success:
       type: string
-      description: A message indicating the success of an operation
+      description: A string message indicating the success of an operation.
       minLength: 1
       maxLength: 100
       pattern: '^[a-zA-Z0-9]+$'
+    
     Comment:
       type: object
-      description: A comment object representing a user's comment on a photo
+      description: A comment object representing a user's comment on a photo.
       properties:
         content:
           type: string
-          description: The content of the comment
+          description: The content of the comment.
           minLength: 1
           maxLength: 150
           pattern: '^[a-zA-Z0-9]+$'
         photoId:
           type: string
-          description: The identifier of the photo being commented on
+          description: The identifier of the photo being commented on.
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9]+$'
         userId:
           type: string
-          description: The identifier of the user who made the comment
+          description: The identifier of the user who made the comment.
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]+$'
         commentId:
           type: string
-          description: The unique identifier of the comment
+          description: The unique identifier of the comment.
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9]+$'
+    
     Photo:
       type: object
-      description: A photo object representing a user's photo
+      description: A photo object representing a user's photo.
       properties:
         photoId:
           type: string
-          description: The unique identifier of the photo
+          description: The unique identifier of the photo.
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
         userId:
           type: string
-          description: The identifier of the user who uploaded the photo
+          description: The identifier of the user who uploaded the photo.
           minLength: 10
           maxLength: 20
           pattern: '^[a-zA-Z0-9_]{10,20}$'
         uploadTime:
           type: string
           format: date-time
-          description: The timestamp of when the photo was uploaded
+          description: The timestamp of when the photo was uploaded.
         likes:
           type: array
           items:
             $ref: '#/components/schemas/Like'
-          description: An array of likes associated with the photo
+          description: An array of likes associated with the photo.
           minItems: 0
           maxItems: 100
         comments:
           type: array
           items:
             $ref: '#/components/schemas/Comment'
-          description: An array of comments associated with the photo
+          description: An array of comments associated with the photo.
           minItems: 0
           maxItems: 100
+    
     Like:
       type: object
-      description: Represents a like made by a user to a photo
+      description: Represents a like made by a user to a photo.
       properties:
         userId:
           type: string
-          description: The identifier of the user who liked the photo
+          description: The identifier of the user who liked the photo.
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
         photoId:
           type: string
-          description: The identifier of the photo being liked
+          description: The identifier of the photo being liked.
           minLength: 1
           maxLength: 50
           pattern: '^[a-zA-Z0-9_]+$'
         timestamp:
           type: string
           format: date-time
-          description: The timestamp of when the like was made
+          description: The timestamp of when the like was made.
+    
     commentId:
       type: string
+      description: A unique identifier for a comment.
       minLength: 10
       maxLength: 20
       pattern: "^[a-zA-Z0-9_]+$"
-      description: A unique comment identifier
+    
     photoId:
       type: string
+      description: A unique identifier for a photo.
       minLength: 10
       maxLength: 20
       pattern: "^[a-zA-Z0-9_]{10,20}$"
-      description: The unique identifier of the photo
+    
     User:
       type: object
-      description: Represents a user, including information about their followers, who they're following, and their photos
+      description: Represents a user, including information about their followers, who they're following, and their photos.
       properties:
         userId:
           type: string
-          description: A unique user identifier
+          description: A unique identifier for the user.
           minLength: 10
           maxLength: 20
           pattern: "^[a-zA-Z0-9_]+$"
         username:
           type: string
-          description: The user's username
+          description: The username of the user.
           minLength: 3
           maxLength: 50
           pattern: "^[a-zA-Z0-9_]+$"
@@ -692,33 +705,33 @@ components:
           type: array
           items:
             type: string
-            description: Unique identifier of a follower
+            description: A unique identifier of a follower.
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the user's followers
+          description: An array of unique identifiers for the user's followers.
           minItems: 0
           maxItems: 100
         following:
           type: array
           items:
             type: string
-            description: Unique identifier of a followed user
+            description: A unique identifier of a followed user.
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the users being followed by the user
+          description: An array of unique identifiers for the users being followed by the user.
           minItems: 0
           maxItems: 100
         photos:
           type: array
           items:
             type: string
-            description: Unique identifier of a photo uploaded by the user
+            description: A unique identifier of a photo uploaded by the user.
             minLength: 10
             maxLength: 20
             pattern: "^[a-zA-Z0-9_]+$"
-          description: An array of unique identifiers for the photos uploaded by the user
+          description: An array of unique identifiers for the photos uploaded by the user.
           minItems: 0
           maxItems: 100
       required:
