@@ -95,8 +95,10 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 	// Check if the username already exists (case-insensitive)
 	var existingID string
 	err := db.c.QueryRow(`SELECT user_id FROM users WHERE username LIKE ? COLLATE NOCASE`, newUsername).Scan(&existingID)
-	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("failed to check existing username: %w", err)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("failed to check existing username: %w", err)
+		}
 	}
 
 	if existingID != "" {
@@ -149,6 +151,9 @@ func (db *appdbimpl) GetUserProfile(username string) (*User, error) {
 		}
 		user.Followers = append(user.Followers, followerID)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching followers: %w", err)
+	}
 
 	// Fetch following
 	rows, err = db.c.Query("SELECT user_id FROM followers WHERE follower_id = ?", user.ID)
@@ -163,6 +168,9 @@ func (db *appdbimpl) GetUserProfile(username string) (*User, error) {
 		}
 		user.Following = append(user.Following, followingID)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching following: %w", err)
+	}
 
 	// Fetch photos
 	rows, err = db.c.Query("SELECT photo_id FROM new_photos WHERE user_id = ?", user.ID)
@@ -176,6 +184,9 @@ func (db *appdbimpl) GetUserProfile(username string) (*User, error) {
 			return nil, fmt.Errorf("failed to read photo row: %w", err)
 		}
 		user.Photos = append(user.Photos, photoID)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching photos: %w", err)
 	}
 
 	return &user, nil
@@ -191,6 +202,7 @@ func (db *appdbimpl) GetUserProfileByID(userID string) (*User, error) {
 		}
 		return nil, fmt.Errorf("query error: %w", err)
 	}
+
 	// Fetch followers
 	rows, err := db.c.Query("SELECT follower_id FROM followers WHERE user_id = ?", user.ID)
 	if err != nil {
@@ -204,6 +216,10 @@ func (db *appdbimpl) GetUserProfileByID(userID string) (*User, error) {
 		}
 		user.Followers = append(user.Followers, followerID)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching followers: %w", err)
+	}
+	rows.Close()
 
 	// Fetch following
 	rows, err = db.c.Query("SELECT user_id FROM followers WHERE follower_id = ?", user.ID)
@@ -218,6 +234,10 @@ func (db *appdbimpl) GetUserProfileByID(userID string) (*User, error) {
 		}
 		user.Following = append(user.Following, followingID)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching following: %w", err)
+	}
+	rows.Close()
 
 	// Fetch photos
 	rows, err = db.c.Query("SELECT photo_id FROM new_photos WHERE user_id = ?", user.ID)
@@ -231,6 +251,9 @@ func (db *appdbimpl) GetUserProfileByID(userID string) (*User, error) {
 			return nil, fmt.Errorf("failed to read photo row: %w", err)
 		}
 		user.Photos = append(user.Photos, photoID)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error while fetching photos: %w", err)
 	}
 
 	return &user, nil
