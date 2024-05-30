@@ -54,27 +54,6 @@ func handleUnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	}
 }
 
-// Handler for getting all banned users
-func handleGetBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-	bannedUsers, err := ctx.Database.GetBans()
-	if err != nil {
-		ctx.Logger.Infof("Internal server error1 " + err.Error())
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(bannedUsers)
-	ctx.Logger.Infof("Banned users fetched")
-	if err != nil {
-		ctx.Logger.Infof("Internal server error " + err.Error())
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-}
-
 func handleIsUserBanned(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var banner = ctx.User.ID
 	userId := ps.ByName("userId")
