@@ -1,6 +1,6 @@
 <template>
   <div class="profile-view">
-    <div v-if="userProfile" class="info-container">
+    <div v-if="userProfile && !userProfile.isBanned" class="info-container">
       <p>Username: {{ userProfile.username }}</p>
       <input v-if="isOwnProfile" v-model="newUsername" placeholder="Change username" />
       <button v-if="isOwnProfile" @click="changeUsername">Change Username</button>
@@ -16,10 +16,13 @@
         {{ userProfile.isBanned ? 'Unban' : 'Ban' }}
       </button>
     </div>
+    <div v-else-if="userProfile && userProfile.isBanned">
+      <p>This profile is not accessible.</p>
+    </div>
     <div v-else>
       <p>No profile data available.</p>
     </div>
-    <div class="gallery">
+    <div class="gallery" v-if="!userProfile.isBanned">
       <PhotoCard
       v-for="photo in detailedPhotos"
         :key="photo.photoId"
@@ -31,14 +34,14 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import api from "@/services/axios";
 import PhotoCard from '@/components/PhotoCard.vue';
 
 const route = useRoute();
+const router = useRouter();
 const userId = route.params.profileId;
 const userProfile = ref(null);
 const newUsername = ref('');
@@ -50,12 +53,17 @@ const fetchUserProfile = async () => {
   try {
     const response = await api.get(`/users/${userId}`);
     userProfile.value = response.data;
-    if (userProfile.value && userProfile.value.photos) {
-      fetchPhotoDetails(userProfile.value.photos);
-    }
     if (!isOwnProfile.value) { // Check if the profile is not the user's own
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
       await checkIfUserIsBanned(); // Check if the user has banned the profile user
+      if (userProfile.value.isBanned) {
+        // If the user is banned, redirect or handle appropriately
+        router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
+        return;
+      }
+    }
+    if (userProfile.value && userProfile.value.photos) {
+      fetchPhotoDetails(userProfile.value.photos);
     }
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -105,6 +113,7 @@ const checkIfUserIsBanned = async () => {
     console.error("Error checking if user is banned:", error);
   }
 };
+
 const followUser = async () => {
   await api.post(`/users/${userId}/follows`, {}, {
     headers: { Authorization: localStorageUserId }
@@ -161,7 +170,6 @@ const handlePhotoDeleted = (photoId) => {
 
 onMounted(fetchUserProfile);
 </script>
-
 
 <style scoped>
 .profile-view {
