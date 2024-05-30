@@ -292,9 +292,9 @@ func (db *appdbimpl) GetAllUsers(currentUserID string) ([]User, error) {
 		SELECT user_id, username
 		FROM users
 		WHERE user_id NOT IN (
-			SELECT banned_user
+			SELECT banned_by
 			FROM new_bans
-			WHERE banned_by = ?
+			WHERE banned_user = ?
 		)
 	`
 	rows, err := db.c.Query(query, currentUserID)
