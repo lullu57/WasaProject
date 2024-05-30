@@ -118,7 +118,6 @@ type AppDatabase interface {
 	GetPhotos() ([]Photo, error)
 	BanUser(bannedBy string, bannedUser string) error
 	UnbanUser(bannerID, bannedUserID string) error
-	GetBans() ([]Ban, error)
 	GetAllUsers(currentUserID string) ([]User, error)
 	GetMyStream(userID string) ([]string, error)
 	DeleteComment(commentID string) error
