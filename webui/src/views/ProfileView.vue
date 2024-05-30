@@ -1,6 +1,6 @@
 <template>
   <div class="profile-view">
-    <div v-if="userProfile && !userProfile.isBanned" class="info-container">
+    <div v-if="userProfile" class="info-container">
       <p>Username: {{ userProfile.username }}</p>
       <input v-if="isOwnProfile" v-model="newUsername" placeholder="Change username" />
       <button v-if="isOwnProfile" @click="changeUsername">Change Username</button>
@@ -16,15 +16,15 @@
         {{ userProfile.isBanned ? 'Unban' : 'Ban' }}
       </button>
     </div>
-    <div v-else-if="userProfile && userProfile.isBanned">
+    <div v-else-if="isBanned">
       <p>This profile is not accessible.</p>
     </div>
     <div v-else>
-      <p>No profile data available.</p>
+      <p>Loading profile...</p>
     </div>
-    <div class="gallery" v-if="!userProfile.isBanned">
+    <div class="gallery" v-if="!isBanned">
       <PhotoCard
-      v-for="photo in detailedPhotos"
+        v-for="photo in detailedPhotos"
         :key="photo.photoId"
         :photo="photo"
         :user-id="localStorageUserId"
@@ -48,6 +48,7 @@ const newUsername = ref('');
 const detailedPhotos = ref([]);
 const localStorageUserId = localStorage.getItem('userId');
 const isOwnProfile = computed(() => userId === localStorageUserId);
+const isBanned = ref(false);
 
 const fetchUserProfile = async () => {
   try {
@@ -56,7 +57,7 @@ const fetchUserProfile = async () => {
     if (!isOwnProfile.value) { // Check if the profile is not the user's own
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
       await checkIfUserIsBanned(); // Check if the user has banned the profile user
-      if (userProfile.value.isBanned) {
+      if (isBanned.value) {
         // If the user is banned, redirect or handle appropriately
         router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
         return;
@@ -108,7 +109,7 @@ const checkIfUserIsBanned = async () => {
         Authorization: `${localStorage.getItem('userId')}`
       }
     })
-    userProfile.value.isBanned = response.data.banned; // Ensure this matches the key returned by your API
+    isBanned.value = response.data.banned; // Ensure this matches the key returned by your API
   } catch (error) {
     console.error("Error checking if user is banned:", error);
   }
@@ -133,6 +134,7 @@ const banUser = async () => {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = true;
+  isBanned.value = true;
 };
 
 const unbanUser = async () => {
@@ -140,6 +142,7 @@ const unbanUser = async () => {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = false;
+  isBanned.value = false;
 };
 
 const changeUsername = async () => {
@@ -163,13 +166,13 @@ const changeUsername = async () => {
   }
 };
 
-
 const handlePhotoDeleted = (photoId) => {
   detailedPhotos.value = detailedPhotos.value.filter(photo => photo.photoId !== photoId);
 };
 
 onMounted(fetchUserProfile);
 </script>
+
 
 <style scoped>
 .profile-view {
