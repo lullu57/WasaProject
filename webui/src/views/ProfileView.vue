@@ -16,13 +16,13 @@
         {{ userProfile.isBanned ? 'Unban' : 'Ban' }}
       </button>
     </div>
-    <div v-else-if="isBanned">
+    <div v-else-if="isBanned || isBannedByProfileOwner">
       <p>This profile is not accessible.</p>
     </div>
     <div v-else>
       <p>Loading profile...</p>
     </div>
-    <div class="gallery" v-if="!isBanned">
+    <div class="gallery" v-if="!isBanned && !isBannedByProfileOwner">
       <PhotoCard
         v-for="photo in detailedPhotos"
         :key="photo.photoId"
@@ -49,6 +49,7 @@ const detailedPhotos = ref([]);
 const localStorageUserId = localStorage.getItem('userId');
 const isOwnProfile = computed(() => userId === localStorageUserId);
 const isBanned = ref(false);
+const isBannedByProfileOwner = ref(false);
 
 const fetchUserProfile = async () => {
   try {
@@ -57,9 +58,12 @@ const fetchUserProfile = async () => {
     if (!isOwnProfile.value) { // Check if the profile is not the user's own
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
       await checkIfUserIsBanned(); // Check if the user has banned the profile user
-      console.log('isBanned:', isBanned.value);
-      console.log('userProfile:', userProfile.value);
-      console
+      await checkIfUserIsBannedByProfileOwner(); // Check if the user is banned by the profile owner
+      if (isBannedByProfileOwner.value) {
+        // If the user is banned by the profile owner, redirect or handle appropriately
+        router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
+        return;
+      }
       if (isBanned.value) {
         // If the user is banned, redirect or handle appropriately
         router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
@@ -111,11 +115,24 @@ const checkIfUserIsBanned = async () => {
       headers: {
         Authorization: `${localStorage.getItem('userId')}`
       }
-    })
-    console.log('Banned response:', response.data);
+    });
     isBanned.value = response.data.banned; // Ensure this matches the key returned by your API
   } catch (error) {
     console.error("Error checking if user is banned:", error);
+  }
+};
+
+const checkIfUserIsBannedByProfileOwner = async () => {
+  try {
+    const response = await api.get(`/bans/${localStorageUserId}`, {
+      headers: {
+        Authorization: `${userId}`
+      }
+    });
+    console.log('Banned by profile owner response:', response.data);
+    isBannedByProfileOwner.value = response.data.banned; // Ensure this matches the key returned by your API
+  } catch (error) {
+    console.error("Error checking if user is banned by profile owner:", error);
   }
 };
 
@@ -176,7 +193,6 @@ const handlePhotoDeleted = (photoId) => {
 
 onMounted(fetchUserProfile);
 </script>
-
 
 <style scoped>
 .profile-view {
