@@ -1,6 +1,6 @@
 <template>
   <div class="profile-view">
-    <div v-if="userProfile" class="info-container">
+    <div v-if="userProfile && !isBanned && !isBannedByProfileOwner" class="info-container">
       <p>Username: {{ userProfile.username }}</p>
       <input v-if="isOwnProfile" v-model="newUsername" placeholder="Change username" />
       <button v-if="isOwnProfile" @click="changeUsername">Change Username</button>
@@ -22,7 +22,7 @@
     <div v-else>
       <p>Loading profile...</p>
     </div>
-    <div class="gallery" v-if="!isBanned && !isBannedByProfileOwner">
+    <div class="gallery" v-if="userProfile && !isBanned && !isBannedByProfileOwner">
       <PhotoCard
         v-for="photo in detailedPhotos"
         :key="photo.photoId"
@@ -59,15 +59,8 @@ const fetchUserProfile = async () => {
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
       await checkIfUserIsBanned(); // Check if the user has banned the profile user
       await checkIfUserIsBannedByProfileOwner(); // Check if the user is banned by the profile owner
-      if (isBannedByProfileOwner.value) {
-        // If the user is banned by the profile owner, redirect or handle appropriately
-        router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
-        return;
-      }
-      if (isBanned.value) {
-        // If the user is banned, redirect or handle appropriately
-        router.push({ name: 'Home' }); // Redirect to Home or another appropriate route
-        return;
+      if (isBannedByProfileOwner.value || isBanned.value) {
+        return; // If the user is banned, stop further processing
       }
     }
     if (userProfile.value && userProfile.value.photos) {
