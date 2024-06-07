@@ -146,7 +146,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/ServerError" }
 
-  /users/{userId}/follows:
+  /users/{userId}/followers:
     parameters:
     - name: userId
       in: path

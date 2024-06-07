@@ -130,14 +130,14 @@ const checkIfUserIsBannedByProfileOwner = async () => {
 };
 
 const followUser = async () => {
-  await api.post(`/users/${userId}/follows`, {}, {
+  await api.post(`/users/${userId}/followers`, {}, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = true;
 };
 
 const unfollowUser = async () => {
-  await api.delete(`/users/${userId}/follows`, {
+  await api.delete(`/users/${userId}/followers`, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = false;
