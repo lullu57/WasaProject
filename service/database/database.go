@@ -131,7 +131,6 @@ type AppDatabase interface {
 	IsLiked(photoID string, userID string) (bool, error)
 	IsUserFollowed(followerID, followedID string) (bool, error)
 	BanExists(bannedBy, bannedUser string) (bool, error)
-	SearchUsers(query string, currentUserID string) ([]User, error)
 }
 type appdbimpl struct {
 	c *sql.DB

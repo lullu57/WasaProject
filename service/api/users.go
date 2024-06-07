@@ -221,27 +221,6 @@ func HandleGetAllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 }
 
-func HandleSearchUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	query := ps.ByName("query")
-	if query == "" {
-		http.Error(w, "Query parameter is required", http.StatusBadRequest)
-		return
-	}
-
-	users, err := ctx.Database.SearchUsers(query, ctx.User.ID)
-	if err != nil {
-		ctx.Logger.Errorf("Failed to search users: %v", err)
-		http.Error(w, "Failed to search users", http.StatusInternalServerError)
-		return
-	}
-
-	ctx.Logger.Infof("Fetched users matching query: %s", query)
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(users); err != nil {
-		ctx.Logger.Errorf("Failed to write response: %v", err)
-	}
-}
-
 func handleGetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	ctx.Logger.Infof("Fetching username for userId")
 	userId := ps.ByName("userId")

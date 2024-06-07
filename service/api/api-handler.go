@@ -20,7 +20,6 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:userId", rt.wrap(HandleGetUserProfileID))
 	rt.router.POST("/users", rt.wrap(HandleAddUser))
 	rt.router.PATCH("/users/username", rt.wrap(HandleSetUsername))
-	rt.router.GET("/searchUsers:query", rt.wrap(HandleSearchUsers))
 
 	// Photo routes
 	rt.router.GET("/photos", rt.wrap(handleGetPhotos))
