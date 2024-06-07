@@ -1,6 +1,7 @@
 <template>
   <div class="discover-users">
     <h2>Discover Users</h2>
+    <input type="text" v-model="searchQuery" @input="searchUsers" placeholder="Search users...">
     <ul class="user-list">
       <li v-for="user in users" :key="user.userId">
         <router-link :to="{ name: 'Profile', params: { profileId: user.userId } }">
@@ -24,7 +25,8 @@ import api from '@/services/axios';
 export default {
   data() {
     return {
-      users: []
+      users: [],
+      searchQuery: ''
     };
   },
   async mounted() {
@@ -45,6 +47,28 @@ export default {
         await this.checkFollowAndBanStatus();
       } catch (error) {
         console.error('Failed to fetch users:', error);
+      }
+    },
+    async searchUsers() {
+      if (this.searchQuery.trim() === '') {
+        await this.fetchUsers();
+        return;
+      }
+
+      try {
+        const response = await api.get('/users/search', {
+          params: { q: this.searchQuery },
+          headers: { Authorization: localStorage.getItem('userId') }
+        });
+        this.users = response.data.map(user => ({
+          ...user,
+          isFollowing: false,
+          isBanned: false,
+          processing: false
+        }));
+        await this.checkFollowAndBanStatus();
+      } catch (error) {
+        console.error('Failed to search users:', error);
       }
     },
     async checkFollowAndBanStatus() {

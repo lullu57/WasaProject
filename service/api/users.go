@@ -221,26 +221,27 @@ func HandleGetAllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 }
 
-/*
-	func handleGetFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-		username := ps.ByName("username")
-		if username == "" {
-			http.Error(w, "Invalid username parameter", http.StatusBadRequest)
-			return
-		}
-
-		followers, err := ctx.Database.GetFollowersByUsername(username)
-		if err != nil {
-			ctx.Logger.Error("Failed to retrieve followers: ", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-		ctx.Logger.Infof("Followers fetched for user: %s", username)
-		response := map[string][]string{"followers": followers}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+func HandleSearchUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	query := ps.ByName("query")
+	if query == "" {
+		http.Error(w, "Query parameter is required", http.StatusBadRequest)
+		return
 	}
-*/
+
+	users, err := ctx.Database.SearchUsers(query, ctx.User.ID)
+	if err != nil {
+		ctx.Logger.Errorf("Failed to search users: %v", err)
+		http.Error(w, "Failed to search users", http.StatusInternalServerError)
+		return
+	}
+
+	ctx.Logger.Infof("Fetched users matching query: %s", query)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(users); err != nil {
+		ctx.Logger.Errorf("Failed to write response: %v", err)
+	}
+}
+
 func handleGetUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	ctx.Logger.Infof("Fetching username for userId")
 	userId := ps.ByName("userId")

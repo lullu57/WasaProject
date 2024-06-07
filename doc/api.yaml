@@ -640,6 +640,46 @@ paths:
               schema:
                 type: boolean
                 description: A boolean indicating whether the user is banned.
+
+  /searchUsers/{query}:
+    get:
+      tags:
+        - user
+      summary: Search Users
+      description: Search for users by username.
+      operationId: searchUsers
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: The query string to search for users by username.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 50
+            pattern: "^[a-zA-Z0-9_]+$"
+            description: The query string to search for users by username.
+      responses:
+        '200':
+          description: Users matching the search query
+          content:
+            application/json:
+              schema:
+                description: An array of users matching the search query
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                minItems: 0
+                maxItems: 100
+              example:
+                - userId: "user123"
+                  username: "john_doe"
+                - userId: "user456"
+                  username: "jane_doe"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
   responses:
     BadRequest:

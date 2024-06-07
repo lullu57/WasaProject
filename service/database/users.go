@@ -361,3 +361,35 @@ func (db *appdbimpl) IsUserFollowed(followedID, followerID string) (bool, error)
 	}
 	return exists, nil
 }
+
+func (db *appdbimpl) SearchUsers(query string, currentUserID string) ([]User, error) {
+	searchQuery := `
+        SELECT user_id, username
+        FROM users
+        WHERE username LIKE ? AND user_id NOT IN (
+            SELECT banned_by
+            FROM new_bans
+            WHERE banned_user = ?
+        )
+    `
+	rows, err := db.c.Query(searchQuery, "%"+query+"%", currentUserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query users: %w", err)
+	}
+	defer rows.Close()
+
+	var users []User
+	for rows.Next() {
+		var user User
+		if err := rows.Scan(&user.ID, &user.Username); err != nil {
+			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return users, nil
+}
