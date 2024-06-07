@@ -31,16 +31,17 @@ export default {
   },
   computed: {
     filteredUsers() {
-      return this.users;
+      const query = this.searchQuery.toLowerCase();
+      return this.users.filter(user => user.username.toLowerCase().includes(query));
     }
   },
   async mounted() {
     await this.fetchUsers();
   },
   methods: {
-    async fetchUsers(query = '') {
+    async fetchUsers() {
       try {
-        const response = await api.get(`/searchUsers/${query}`, {
+        const response = await api.get(`/users`, {
           headers: { Authorization: localStorage.getItem('userId') }
         });
         this.users = response.data.map(user => ({
@@ -112,7 +113,7 @@ export default {
       }
     },
     searchUsers() {
-      this.fetchUsers(this.searchQuery);
+      this.$forceUpdate();
     }
   }
 }
