@@ -28,13 +28,15 @@ paths:
         content:
           application/json:
             schema:
+              description: Details of the user attempting to log in
               type: object
               properties:
                 name:
-                  type: string 
-                  example: Maria 
-                  pattern: '^.*?$' 
-                  minLength: 3 
+                  type: string
+                  description: The name of the user
+                  example: Maria
+                  pattern: '^.*?$'
+                  minLength: 3
                   maxLength: 16
         required: true
       responses:
@@ -43,11 +45,15 @@ paths:
           content:
             application/json:
               schema:
+                description: The response schema for a successful login or user creation
                 type: object
                 properties:
                   identifier:
                     type: string
+                    description: The unique identifier for the user
                     example: "abcdef012345"
+              example:
+                identifier: "abcdef012345"
         '400':
           $ref: '#/components/responses/BadRequest'
         '409':
@@ -55,11 +61,15 @@ paths:
           content:
             application/json:
               schema:
+                description: The response schema when the username already exists
                 type: object
                 properties:
                   message:
                     type: string
+                    description: Error message indicating the username already exists
                     example: "Username already exists"
+              example:
+                message: "Username already exists"
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -90,10 +100,12 @@ paths:
           content:
             text/plain:
               schema:
+                description: Schema for the response when the username already exists
                 type: object
                 properties:
                   message:
                     type: string
+                    description: Error message indicating the username already exists
                     example: "Username already exists"
 
 
@@ -109,20 +121,41 @@ paths:
           content:
             application/json:
               schema:
+                description: An array of photos uploaded by users followed by the current user
                 type: array
                 items:
                   $ref: '#/components/schemas/Photo'
                 minItems: 0
                 maxItems: 100
+              example:
+                [
+                  {
+                    "photoId": "photo123",
+                    "userId": "user123",
+                    "uploadTime": "2023-01-01T00:00:00Z",
+                    "likes": [],
+                    "comments": []
+                  },
+                  {
+                    "photoId": "photo456",
+                    "userId": "user456",
+                    "uploadTime": "2023-01-02T00:00:00Z",
+                    "likes": [],
+                    "comments": []
+                  }
+                ]
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "500": 
+          $ref: "#/components/responses/ServerError"
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /users/{userId}:
     parameters:
     - name: userId
       in: path
       required: true
+      description: The unique identifier of the user.
       schema:
         type: string
         description: The unique identifier of the user.
@@ -141,16 +174,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              example:
+                {
+                  "userId": "user123",
+                  "username": "john_doe",
+                  "followers": [],
+                  "following": [],
+                  "photos": []
+                }
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: "#/components/responses/Unauthorized"
+        "500": 
+          $ref: "#/components/responses/ServerError"
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /users/{userId}/followers:
     parameters:
     - name: userId
       in: path
       required: true
+      description: The unique identifier of the user.
       schema:
         type: string
         description: The unique identifier of the user.
@@ -169,11 +214,13 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
-
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
-
+              example: "Follow action successful"
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: "#/components/responses/Unauthorized"
+        "500": 
+          $ref: "#/components/responses/ServerError"
     delete:
       tags: [user]
       summary: Unfollow User
@@ -186,16 +233,21 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
+              example: "Unfollow action successful"
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: "#/components/responses/Unauthorized"
+        "500": 
+          $ref: "#/components/responses/ServerError"
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /users/{userId}/bans:
     parameters:
     - name: userId
       in: path
       required: true
+      description: The unique identifier of the user.
       schema:
         type: string
         pattern: "^[a-zA-Z0-9]+$"
@@ -240,6 +292,7 @@ paths:
       - name: commentId
         in: path
         required: true
+        description: The unique identifier of the comment.
         schema:
           $ref: '#/components/schemas/commentId'
     delete:
@@ -261,11 +314,12 @@ paths:
     
   /photos/{photoId}/comments:
     parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/photoId'
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/photoId'
+        description: The unique identifier of the photo.
     post:
       tags: [comment]
       summary: Add Comment
@@ -284,10 +338,14 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
+                description: A string message indicating the success of an operation.
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: "#/components/responses/Unauthorized"
+        "500": 
+          $ref: "#/components/responses/ServerError"
 
     get:
       tags: [comment]
@@ -305,10 +363,14 @@ paths:
                   $ref: '#/components/schemas/Comment'
                 minItems: 0
                 maxItems: 100
+                description: An array of comments associated with the photo.
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: "#/components/responses/Unauthorized"
+        "500": 
+          $ref: "#/components/responses/ServerError"
 
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "500": { $ref: "#/components/responses/ServerError" }
 
   /photos:
     post:
@@ -349,6 +411,7 @@ paths:
                   $ref: '#/components/schemas/Photo'
                 minItems: 0
                 maxItems: 100
+                description: An array of photos uploaded by users.
 
         '500':
           $ref: '#/components/responses/ServerError'
@@ -499,6 +562,7 @@ paths:
           application/json:
             schema:
               type: object
+              description: The new username to set for the user
               properties:
                 newUsername:
                   type: string
@@ -506,6 +570,7 @@ paths:
                   maxLength: 50
                   pattern: "^[a-zA-Z0-9_]+$"
                   example: "new_username"
+                  description: The new username to set for the user
       responses:
         '200':
           description: Username updated successfully.
@@ -513,10 +578,12 @@ paths:
             application/json:
               schema:
                 type: object
+                description: The response schema for a successful username update
                 properties:
                   message:
                     type: string
                     example: Username updated successfully
+                    description: A message indicating the username was updated successfully
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -528,6 +595,7 @@ paths:
       - name: userId
         in: path
         required: true
+        description: The unique identifier of the user.
         schema:
           type: string
           description: The unique identifier of the user.
@@ -547,6 +615,7 @@ paths:
             application/json:
               schema:
                 type: boolean
+                description: A boolean indicating whether the user is followed.
   /bans/{userId}: 
     parameters:
     - name: userId
@@ -570,6 +639,7 @@ paths:
             application/json:
               schema:
                 type: boolean
+                description: A boolean indicating whether the user is banned.
 components:
   responses:
     BadRequest:
@@ -635,6 +705,8 @@ components:
           type: string
           format: date-time
           description: The timestamp of when the photo was uploaded.
+          minLength: 10
+          maxLength: 20
         likes:
           type: array
           items:
@@ -670,6 +742,8 @@ components:
           type: string
           format: date-time
           description: The timestamp of when the like was made.
+          minLength: 1
+          maxLength: 50
     
     commentId:
       type: string
