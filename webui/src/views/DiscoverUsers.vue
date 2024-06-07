@@ -1,9 +1,9 @@
 <template>
   <div class="discover-users">
     <h2>Discover Users</h2>
-    <input type="text" v-model="searchQuery" @input="searchUsers" placeholder="Search users...">
+    <input v-model="searchQuery" @input="searchUsers" placeholder="Search users..." class="search-box" />
     <ul class="user-list">
-      <li v-for="user in users" :key="user.userId">
+      <li v-for="user in filteredUsers" :key="user.userId">
         <router-link :to="{ name: 'Profile', params: { profileId: user.userId } }">
           {{ user.username }}
         </router-link>
@@ -29,13 +29,18 @@ export default {
       searchQuery: ''
     };
   },
+  computed: {
+    filteredUsers() {
+      return this.users;
+    }
+  },
   async mounted() {
     await this.fetchUsers();
   },
   methods: {
-    async fetchUsers() {
+    async fetchUsers(query = '') {
       try {
-        const response = await api.get('/users', {
+        const response = await api.get(`/searchUsers/${query}`, {
           headers: { Authorization: localStorage.getItem('userId') }
         });
         this.users = response.data.map(user => ({
@@ -47,28 +52,6 @@ export default {
         await this.checkFollowAndBanStatus();
       } catch (error) {
         console.error('Failed to fetch users:', error);
-      }
-    },
-    async searchUsers() {
-      if (this.searchQuery.trim() === '') {
-        await this.fetchUsers();
-        return;
-      }
-
-      try {
-        const response = await api.get('/users/search', {
-          params: { q: this.searchQuery },
-          headers: { Authorization: localStorage.getItem('userId') }
-        });
-        this.users = response.data.map(user => ({
-          ...user,
-          isFollowing: false,
-          isBanned: false,
-          processing: false
-        }));
-        await this.checkFollowAndBanStatus();
-      } catch (error) {
-        console.error('Failed to search users:', error);
       }
     },
     async checkFollowAndBanStatus() {
@@ -127,6 +110,9 @@ export default {
       } finally {
         user.processing = false;
       }
+    },
+    searchUsers() {
+      this.fetchUsers(this.searchQuery);
     }
   }
 }
@@ -135,6 +121,13 @@ export default {
 <style scoped>
 .discover-users {
   padding: 20px;
+}
+
+.search-box {
+  margin-bottom: 20px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .user-list {
