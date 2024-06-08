@@ -44,12 +44,6 @@ function logout() {
                 Login
               </RouterLink>
             </li>
-            <li class="nav-item" v-if="isAuthenticated">
-              <button @click="logout" class="btn nav-link">
-                <svg class="feather"></svg>
-                Logout
-              </button>
-            </li>
             <li class="nav-item">
               <RouterLink to="/discover" class="nav-link" v-if="isAuthenticated">
                 <svg class="feather"></svg>
@@ -58,6 +52,12 @@ function logout() {
             </li>
             <li class="nav-item">
               <UploadImage v-if="isAuthenticated"/>
+            </li>
+            <li class="nav-item" v-if="isAuthenticated">
+              <button @click="logout" class="btn nav-link">
+                <svg class="feather"></svg>
+                Logout
+              </button>
             </li>
           </ul>
         </div>
