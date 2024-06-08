@@ -50,7 +50,7 @@ function logout() {
                 Discover Users
               </RouterLink>
             </li>
-            <li class="nav-item" v-if="isAuthenticated">
+            <li class="nav-item logout-container" v-if="isAuthenticated">
               <button @click="logout" class="btn nav-link">
                 <svg class="feather"></svg>
                 Logout
@@ -72,4 +72,8 @@ function logout() {
 </template>
 
 <style>
+.logout-container {
+  display: flex;
+  justify-content: center;
+}
 </style>
