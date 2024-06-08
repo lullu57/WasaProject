@@ -489,7 +489,7 @@ paths:
     post:
       tags: [like]
       summary: Add Photo like
-      description: Add a like to a photo.
+      description: Adds a new like to the photo's likes collection
       operationId: likePhoto
       responses:
         '201':
@@ -506,7 +506,7 @@ paths:
     delete:
       tags: [like]
       summary: Remove Like
-      description: Removes a like from a photo.
+      description: Removes a like from the photo's likes collection
       operationId: unlikePhoto
       responses:
         '201':
