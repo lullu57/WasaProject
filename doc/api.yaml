@@ -130,15 +130,15 @@ paths:
               example:
                 [
                   {
-                    "photoId": "photo123",
-                    "userId": "user123",
+                    "photoId": "photo1234567",
+                    "userId": "user12323131",
                     "uploadTime": "2023-01-01T00:00:00Z",
                     "likes": [],
                     "comments": []
                   },
                   {
-                    "photoId": "photo456",
-                    "userId": "user456",
+                    "photoId": "photo4567891",
+                    "userId": "user45632132",
                     "uploadTime": "2023-01-02T00:00:00Z",
                     "likes": [],
                     "comments": []
@@ -176,7 +176,7 @@ paths:
                 $ref: '#/components/schemas/User'
               example:
                 {
-                  "userId": "user123",
+                  "userId": "user1234567",
                   "username": "john_doe",
                   "followers": [],
                   "following": [],
@@ -338,7 +338,6 @@ paths:
             text/plain:
               schema:
                 $ref: '#/components/schemas/Success'
-                description: A string message indicating the success of an operation.
 
         "400": 
           $ref: "#/components/responses/BadRequest"
@@ -655,7 +654,7 @@ components:
       description: A string message indicating the success of an operation.
       minLength: 1
       maxLength: 100
-      pattern: '^[a-zA-Z0-9]+$'
+      pattern: '^[a-zA-Z0-9\s]+$'
     
     Comment:
       type: object
