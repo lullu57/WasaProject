@@ -75,6 +75,7 @@ function logout() {
 .logout-btn {
   padding-left: 20px;
   text-align: left;
+  align-items: center;
 }
 </style>
 
