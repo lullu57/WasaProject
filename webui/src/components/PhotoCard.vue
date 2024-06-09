@@ -53,7 +53,6 @@ export default {
       try {
         const response = await api.get(`/photos/${this.photoData.photoId}/likes`, config);
         this.isLiked = response.data.liked;
-
       } catch (error) {
         console.error('Failed to check like status', error);
       }
@@ -84,15 +83,19 @@ export default {
             Authorization: this.userId
           }
         };
-        const response = await api.post(`/photos/${this.photoData.photoId}/comments`, { content: this.newComment }, config);
-        let username = 'You'; // Ideally fetch from server or use global state
-        this.photoData.comments.push({
-          username,
-          content: this.newComment,
-          commentId: response.data.commentId,
-          userId: this.userId // Use the computed property
-        });
-        this.newComment = '';
+        try {
+          const response = await api.post(`/photos/${this.photoData.photoId}/comments`, { content: this.newComment }, config);
+          let username = 'You'; // Ideally fetch from server or use global state
+          this.photoData.comments.push({
+            username,
+            content: this.newComment,
+            commentId: response.data.commentId,
+            userId: this.userId // Use the computed property
+          });
+          this.newComment = '';
+        } catch (error) {
+          console.error('Failed to post comment', error);
+        }
       }
     },
     async deleteComment(commentId) {
@@ -126,6 +129,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .photo-card {

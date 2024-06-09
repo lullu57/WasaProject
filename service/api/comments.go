@@ -46,8 +46,8 @@ func handleCommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 	ctx.Logger.Infof("Comment added by %s", ctx.User.Username)
-	w.WriteHeader(http.StatusCreated)
-	if _, err := w.Write([]byte("Comment added successfully")); err != nil {
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(map[string]string{"commentId": comment.ID}); err != nil {
 		ctx.Logger.Errorf("Failed to write response: %v", err)
 	}
 }
