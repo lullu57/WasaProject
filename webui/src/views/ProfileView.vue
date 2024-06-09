@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from "@/services/axios";
 import PhotoCard from '@/components/PhotoCard.vue';
@@ -47,13 +47,13 @@ const userProfile = ref(null);
 const newUsername = ref('');
 const detailedPhotos = ref([]);
 const localStorageUserId = localStorage.getItem('userId');
-const isOwnProfile = computed(() => userId === localStorageUserId);
+const isOwnProfile = computed(() => userId.value === localStorageUserId);
 const isBanned = ref(false);
 const isBannedByProfileOwner = ref(false);
 
 const fetchUserProfile = async () => {
   try {
-    const response = await api.get(`/users/${userId}`);
+    const response = await api.get(`/users/${userId.value}`);
     userProfile.value = response.data;
     if (!isOwnProfile.value) { // Check if the profile is not the user's own
       await checkIfUserIsFollowed(); // Check if the user is following the profile user
@@ -64,7 +64,7 @@ const fetchUserProfile = async () => {
       }
     }
     if (userProfile.value && userProfile.value.photos) {
-      fetchPhotoDetails(userProfile.value.photos);
+      await fetchPhotoDetails(userProfile.value.photos);
     }
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -86,12 +86,12 @@ const fetchPhotoDetails = async (photoIds) => {
       console.error("Error fetching photo details:", error);
       return null;
     }
-  }));
+  })).then(results => results.filter(photo => photo !== null)); // Filter out null results
 };
 
 const checkIfUserIsFollowed = async () => {
   try {
-    const response = await api.get(`/follows/${userId}`, {
+    const response = await api.get(`/follows/${userId.value}`, {
       headers: {
         Authorization: `${localStorage.getItem('userId')}`
       }
@@ -104,7 +104,7 @@ const checkIfUserIsFollowed = async () => {
 
 const checkIfUserIsBanned = async () => {
   try {
-    const response = await api.get(`/bans/${userId}`, {
+    const response = await api.get(`/bans/${userId.value}`, {
       headers: {
         Authorization: `${localStorage.getItem('userId')}`
       }
@@ -119,7 +119,7 @@ const checkIfUserIsBannedByProfileOwner = async () => {
   try {
     const response = await api.get(`/bans/${localStorageUserId}`, {
       headers: {
-        Authorization: `${userId}`
+        Authorization: `${userId.value}`
       }
     });
     console.log('Banned by profile owner response:', response.data);
@@ -130,21 +130,21 @@ const checkIfUserIsBannedByProfileOwner = async () => {
 };
 
 const followUser = async () => {
-  await api.post(`/users/${userId}/followers`, {}, {
+  await api.post(`/users/${userId.value}/followers`, {}, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = true;
 };
 
 const unfollowUser = async () => {
-  await api.delete(`/users/${userId}/followers`, {
+  await api.delete(`/users/${userId.value}/followers`, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isFollowing = false;
 };
 
 const banUser = async () => {
-  await api.post(`/users/${userId}/bans`, {}, {
+  await api.post(`/users/${userId.value}/bans`, {}, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = true;
@@ -152,7 +152,7 @@ const banUser = async () => {
 };
 
 const unbanUser = async () => {
-  await api.delete(`/users/${userId}/bans`, {
+  await api.delete(`/users/${userId.value}/bans`, {
     headers: { Authorization: localStorageUserId }
   });
   userProfile.value.isBanned = false;
@@ -185,7 +185,13 @@ const handlePhotoDeleted = (photoId) => {
 };
 
 onMounted(fetchUserProfile);
+
+watch(route, async (newRoute) => {
+  userId.value = newRoute.params.profileId;
+  await fetchUserProfile();
+});
 </script>
+
 
 <style scoped>
 .profile-view {
