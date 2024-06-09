@@ -33,9 +33,6 @@
     </div>
   </div>
 </template>
-<template>
-  <!-- unchanged template -->
-</template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
