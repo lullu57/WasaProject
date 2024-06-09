@@ -24,7 +24,9 @@ export default {
         const response = await api.post('/session', { name: this.username });
         localStorage.setItem("userId", response.data.token);
         axios.defaults.headers.common['Authorization'] = response.data;
-        this.$router.push('/stream'); // Redirects to /stream using Vue Router
+        this.$router.push('/stream').then(() => {
+          window.location.reload(); 
+        });
       } catch (err) {
         this.error = 'Failed to login. Please try again.';
         console.error(err);
