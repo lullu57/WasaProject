@@ -169,7 +169,6 @@ const changeUsername = async () => {
     userProfile.value.username = newUsername.value; // Update the username in the view
     newUsername.value = ''; // Clear the input field
     alert('Username changed successfully!');
-    eventBus.config.globalProperties.$emit('usernameChanged', newUsername.value); // Use the event bus
     router.push('/profile/' + userProfile.value.userId); // navigate to the new profile url
     window.location.reload(); // refresh the page
 
