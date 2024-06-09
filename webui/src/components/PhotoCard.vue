@@ -1,18 +1,17 @@
 <template>
   <div class="photo-card">
-    <img :src="'data:image/jpeg;base64,' + photoData.imageData" alt="Photo" class="photo-image"/>
+    <img :src="'data:image/jpeg;base64,' + photoData.imageData" alt="Photo" class="photo-image" />
     <div class="photo-info">
       <h4>{{ photoData.username }}</h4>
       <p>{{ formatDate(photoData.timestamp) }}</p>
       <div class="photo-actions">
         <button @click="toggleLike">{{ isLiked ? 'Unlike' : 'Like' }} ({{ photoData.likesCount }})</button>
         <button @click="toggleComments">Comments ({{ photoData.comments.length }})</button>
-        <!-- Delete photo button, visible only to the photo owner -->
         <button v-if="photoData.userId === userId" @click="deletePhoto(photoData.photoId)" class="delete-photo">Delete</button>
       </div>
       <div v-if="showComments" class="comments-section">
         <div class="comment-form">
-          <input v-model="newComment" placeholder="Write a comment..." class="comment-input"/>
+          <input v-model="newComment" placeholder="Write a comment..." class="comment-input" />
           <button @click="postComment" class="post-comment">Post</button>
         </div>
         <div class="comment" v-for="comment in photoData.comments" :key="comment.commentId">
@@ -26,6 +25,7 @@
 
 <script>
 import api from '@/services/axios';
+import eventBus from '@/eventBus'; 
 
 export default {
   props: {
@@ -42,10 +42,10 @@ export default {
   },
   mounted() {
     this.checkIfLiked();
-    this.$eventBus.$on('usernameChanged', this.updateUsername); // Listen for the event using the event bus
+    eventBus.on('usernameChanged', this.updateUsername); // Listen for the event using the event bus
   },
   beforeUnmount() {
-    this.$eventBus.$off('usernameChanged', this.updateUsername); // Remove the event listener
+    eventBus.off('usernameChanged', this.updateUsername); // Remove the event listener
   },
   methods: {
     async checkIfLiked() {
@@ -69,10 +69,10 @@ export default {
       };
       try {
         if (!this.isLiked) {
-          const response = await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);         
+          await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);
           this.photoData.likesCount++;
         } else {
-          const response = await api.delete(`/photos/${this.photoData.photoId}/likes`, config);
+          await api.delete(`/photos/${this.photoData.photoId}/likes`, config);
           this.photoData.likesCount--;
         }
         this.isLiked = !this.isLiked;
@@ -139,7 +139,7 @@ export default {
       return new Date(value).toLocaleString();
     }
   }
-}
+};
 </script>
 
 <style scoped>
