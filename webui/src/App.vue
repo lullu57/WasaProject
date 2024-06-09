@@ -69,7 +69,9 @@ function logout() {
 .logout-btn {
   padding-left: 20px; /* Adjust the value as needed */
   text-align: left;
-  margin-top: auto; /* Ensure it sticks to the bottom */
+  margin-top: 200px; /* Ensure it sticks to the bottom */
+  font-size: 0.875rem;
+	font-family: 'Tisa', sans-serif
 }
 </style>
 
