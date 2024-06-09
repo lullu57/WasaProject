@@ -7,11 +7,11 @@
         <router-link :to="{ name: 'Profile', params: { profileId: user.userId } }">
           {{ user.username }}
         </router-link>
-        <button @click="toggleFollow(user)" :disabled="user.processing">
+        <!-- Hide follow and ban buttons for the user's own profile -->
+        <button v-if="user.userId !== localStorageUserId" @click="toggleFollow(user)" :disabled="user.processing">
           {{ user.isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
-        <!-- Toggle Ban/Unban -->
-        <button @click="toggleBan(user)" :disabled="user.processing">
+        <button v-if="user.userId !== localStorageUserId" @click="toggleBan(user)" :disabled="user.processing">
           {{ user.isBanned ? 'Unban' : 'Ban' }}
         </button>
       </li>
@@ -26,7 +26,8 @@ export default {
   data() {
     return {
       users: [],
-      searchQuery: ''
+      searchQuery: '',
+      localStorageUserId: localStorage.getItem('userId'), // Get the user's ID from localStorage
     };
   },
   computed: {
@@ -42,14 +43,19 @@ export default {
     async fetchUsers() {
       try {
         const response = await api.get(`/users`, {
-          headers: { Authorization: localStorage.getItem('userId') }
+          headers: { Authorization: this.localStorageUserId }
         });
-        this.users = response.data.map(user => ({
+        const users = response.data.map(user => ({
           ...user,
           isFollowing: false,
           isBanned: false,
           processing: false
         }));
+
+        // Separate the user's own profile and move it to the top
+        const ownProfile = users.find(user => user.userId === this.localStorageUserId);
+        this.users = ownProfile ? [ownProfile, ...users.filter(user => user.userId !== this.localStorageUserId)] : users;
+
         await this.checkFollowAndBanStatus();
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -59,12 +65,12 @@ export default {
       try {
         await Promise.all(this.users.map(async (user) => {
           const followRes = await api.get(`/follows/${user.userId}`, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isFollowing = followRes.data.isFollowed;
 
           const banRes = await api.get(`/bans/${user.userId}`, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isBanned = banRes.data.banned;
         }));
@@ -77,12 +83,12 @@ export default {
       try {
         if (user.isFollowing) {
           await api.delete(`/users/${user.userId}/followers`, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isFollowing = false;
         } else {
           await api.post(`/users/${user.userId}/followers`, {}, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isFollowing = true;
         }
@@ -97,12 +103,12 @@ export default {
       try {
         if (user.isBanned) {
           await api.delete(`/users/${user.userId}/bans`, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isBanned = false;
         } else {
           await api.post(`/users/${user.userId}/bans`, {}, {
-            headers: { Authorization: localStorage.getItem('userId') }
+            headers: { Authorization: this.localStorageUserId }
           });
           user.isBanned = true;
         }
