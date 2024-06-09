@@ -68,12 +68,13 @@ const fetchUserProfile = async () => {
     }
   } catch (error) {
     console.error("Error fetching user profile:", error);
+    console.log(`Request failed with status code ${error.response?.status}: ${error.response?.data}`);
   }
 };
 
 const fetchPhotoDetails = async (photoIds) => {
-  detailedPhotos.value = await Promise.all(photoIds.map(async (id) => {
-    try {
+  try {
+    detailedPhotos.value = await Promise.all(photoIds.map(async (id) => {
       const res = await api.get(`/photos/${id}`, {
         headers: {
           Authorization: `${localStorage.getItem('userId')}`
@@ -86,11 +87,10 @@ const fetchPhotoDetails = async (photoIds) => {
         return comment;
       }));
       return photo;
-    } catch (error) {
-      console.error("Error fetching photo details:", error);
-      return null;
-    }
-  })).then(results => results.filter(photo => photo !== null)); // Filter out null results
+    }));
+  } catch (error) {
+    console.error("Error fetching photo details:", error);
+  }
 };
 
 const checkIfUserIsFollowed = async () => {
