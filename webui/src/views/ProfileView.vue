@@ -33,6 +33,9 @@
     </div>
   </div>
 </template>
+<template>
+  <!-- unchanged template -->
+</template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
@@ -168,6 +171,10 @@ const changeUsername = async () => {
     userProfile.value.username = newUsername.value; // Update the username in the view
     newUsername.value = ''; // Clear the input field
     alert('Username changed successfully!');
+    // Emit an event with the new username
+    router.push('/profile/' + userProfile.value.userId); // navigate to the new profile url
+    window.location.reload(); // refresh the page
+
   } catch (error) {
     console.error("Error changing username:", error);
     if (error.response && error.response.status === 409) {
@@ -189,7 +196,6 @@ watch(route, async (newRoute) => {
   await fetchUserProfile();
 });
 </script>
-
 
 <style scoped>
 .profile-view {

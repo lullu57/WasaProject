@@ -42,6 +42,10 @@ export default {
   },
   mounted() {
     this.checkIfLiked();
+    this.$root.$on('usernameChanged', this.updateUsername);
+  },
+  beforeUnmount() {
+    this.$root.$off('usernameChanged', this.updateUsername);
   },
   methods: {
     async checkIfLiked() {
@@ -123,13 +127,20 @@ export default {
         console.error('Failed to delete photo', error);
       }
     },
+    updateUsername(newUsername) {
+      this.photoData.username = newUsername;
+      this.photoData.comments.forEach(comment => {
+        if (comment.userId === this.userId) {
+          comment.username = newUsername;
+        }
+      });
+    },
     formatDate(value) {
       return new Date(value).toLocaleString();
     }
   }
 }
 </script>
-
 
 <style scoped>
 .photo-card {
