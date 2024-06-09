@@ -122,7 +122,6 @@ const checkIfUserIsBannedByProfileOwner = async () => {
         Authorization: `${userId.value}`
       }
     });
-    console.log('Banned by profile owner response:', response.data);
     isBannedByProfileOwner.value = response.data.banned; // Ensure this matches the key returned by your API
   } catch (error) {
     console.error("Error checking if user is banned by profile owner:", error);
@@ -161,7 +160,6 @@ const unbanUser = async () => {
 
 const changeUsername = async () => {
   try {
-    console.log('Changing username to:', newUsername.value);
     await api.patch(`/users/username`, {
       newUsername: newUsername.value
     }, {
