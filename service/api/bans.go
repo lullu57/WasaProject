@@ -10,8 +10,13 @@ import (
 
 func handleBanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	userId := ps.ByName("userId")
-
 	bannedBy := ctx.User.ID
+
+	// Check if user is trying to ban themselves
+	if userId == bannedBy {
+		http.Error(w, "Cannot ban yourself", http.StatusBadRequest)
+		return
+	}
 
 	// Check if the banning user is banned by the user they are trying to ban
 	isBannedByUser, err := ctx.Database.IsBannedBy(userId, bannedBy)
@@ -40,22 +45,23 @@ func handleBanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params,
 	}
 }
 
-// Handler for unbanning a user
 func handleUnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	userId := ps.ByName("userId")
-	ctx.Logger.Infof("Unbanning user %s", userId)
 	if userId == "" {
-		ctx.Logger.Infof("Invalid parameters")
 		http.Error(w, "Invalid parameters", http.StatusBadRequest)
 		return
 	}
 
-	// Fetch user IDs by username
+	// Check if user is trying to unban themselves
+	if userId == ctx.User.ID {
+		http.Error(w, "Cannot unban yourself", http.StatusBadRequest)
+		return
+	}
+
 	bannerUser := ctx.User.ID
 
 	err := ctx.Database.UnbanUser(bannerUser, userId)
 	if err != nil {
-		ctx.Logger.Infof("Internal server error: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

@@ -166,8 +166,13 @@ func doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx r
 
 func HandleFollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	userId := ps.ByName("userId")
-
 	followerID := ctx.User.ID
+
+	// Check if user is trying to follow themselves
+	if userId == followerID {
+		http.Error(w, "Cannot follow yourself", http.StatusBadRequest)
+		return
+	}
 
 	err := ctx.Database.FollowUser(followerID, userId)
 	if err != nil {
@@ -185,10 +190,14 @@ func HandleFollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 func HandleUnfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	userId := ps.ByName("userId")
-
-	ctx.Logger.Infof("Unfollowing user: %s", userId)
-
 	followerID := ctx.User.ID
+
+	// Check if user is trying to unfollow themselves
+	if userId == followerID {
+		http.Error(w, "Cannot unfollow yourself", http.StatusBadRequest)
+		return
+	}
+
 	err := ctx.Database.UnfollowUser(followerID, userId)
 	if err != nil {
 		ctx.Logger.Errorf("Error unfollowing user: %v", err)
