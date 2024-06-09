@@ -66,13 +66,15 @@ function logout() {
 </template>
 
 <style>
+.button {
+  margin-top: 20px;
+}
 .logout-btn {
   padding-left: 40px;
   text-align: left;
-  margin-top: 200px;
   font-size: 0.875rem;
 	font-family: 'Tisa', sans-serif;
-  padding-top: 20px;
+  padding-top: 10px;
   font-weight: bold;
 }
 </style>
