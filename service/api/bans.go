@@ -12,7 +12,19 @@ func handleBanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params,
 	userId := ps.ByName("userId")
 
 	bannedBy := ctx.User.ID
-	var err = ctx.Database.BanUser(bannedBy, userId)
+
+	// Check if the banning user is banned by the user they are trying to ban
+	isBannedByUser, err := ctx.Database.IsBannedBy(userId, bannedBy)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	if isBannedByUser {
+		http.Error(w, "Cannot ban a user who has banned you", http.StatusForbidden)
+		return
+	}
+
+	err = ctx.Database.BanUser(bannedBy, userId)
 	if err != nil {
 		if err.Error() == "user is already banned" {
 			http.Error(w, "User is already banned", http.StatusConflict)

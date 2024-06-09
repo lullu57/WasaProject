@@ -32,6 +32,15 @@ func (db *appdbimpl) BanUser(bannedBy, bannedUser string) error {
 	return nil
 }
 
+func (db *appdbimpl) IsBannedBy(bannedUser, banningUser string) (bool, error) {
+	var exists bool
+	err := db.c.QueryRow("SELECT EXISTS(SELECT 1 FROM new_bans WHERE banned_user = ? AND banned_by = ?)", bannedUser, banningUser).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("error checking if user is banned by: %w", err)
+	}
+	return exists, nil
+}
+
 func (db *appdbimpl) UnbanUser(bannerID, bannedUserID string) error {
 	stmt, err := db.c.Prepare("DELETE FROM new_bans WHERE banned_by = ? AND banned_user = ?")
 	if err != nil {
