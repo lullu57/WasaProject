@@ -72,7 +72,7 @@ function logout() {
   margin-top: 200px;
   font-size: 0.875rem;
 	font-family: 'Tisa', sans-serif;
-  padding-top: 10px;
+  padding-top: 20px;
   font-weight: bold;
 }
 </style>
