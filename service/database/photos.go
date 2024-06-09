@@ -152,7 +152,7 @@ func (db *appdbimpl) GetPhoto(photoId, userId string) (*PhotoDetail, error) {
 	// Iterate over the results and populate the comments slice
 	for rows.Next() {
 		var comment Comment
-		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.Timestamp); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.PhotoID, &comment.Content, &comment.Timestamp); err != nil {
 			return nil, err
 		}
 

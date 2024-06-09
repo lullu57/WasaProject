@@ -157,6 +157,7 @@ func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		http.Error(w, "Invalid photo ID", http.StatusBadRequest)
 		return
 	}
+	ctx.Logger.Info("Fetching photo ", photoID)
 
 	photo, err := ctx.Database.GetPhoto(photoID, ctx.User.ID) // Pass the current user ID to filter banned users
 	if err != nil {
