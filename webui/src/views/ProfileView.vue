@@ -39,7 +39,6 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from "@/services/axios";
 import PhotoCard from '@/components/PhotoCard.vue';
-import eventBus from '@/eventBus'; 
 
 const route = useRoute();
 const router = useRouter();
