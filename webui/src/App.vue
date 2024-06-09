@@ -50,22 +50,16 @@ function logout() {
                 Discover Users
               </RouterLink>
             </li>
-            <li class="nav-item" v-if="isAuthenticated">
-              <button @click="logout" class="btn nav-link logout-btn">
-                <svg class="feather"></svg>
-                Logout
-              </button>
-            </li>
             <li class="nav-item">
               <UploadImage v-if="isAuthenticated"/>
             </li>
           </ul>
+          <button @click="logout" class="btn btn-light w-100 mt-auto logout-btn">Logout</button>
         </div>
       </nav>
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <RouterView />
-        
       </main>
     </div>
   </div>
@@ -73,9 +67,9 @@ function logout() {
 
 <style>
 .logout-btn {
-  padding-left: 20px;
+  padding-left: 20px; /* Adjust the value as needed */
   text-align: left;
-  align-items: center;
+  margin-top: auto; /* Ensure it sticks to the bottom */
 }
 </style>
 
