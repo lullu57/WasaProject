@@ -34,7 +34,6 @@
             }
           });
           alert('Upload successful!');
-          console.log(response.data);
         } catch (error) {
           console.error('Upload failed:', error);
           alert('Upload failed!');

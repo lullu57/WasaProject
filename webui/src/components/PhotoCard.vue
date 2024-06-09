@@ -51,12 +51,9 @@ export default {
         }
       };
       try {
-        console.log('Checking like status for photo', this.photoData.photoId);
         const response = await api.get(`/photos/${this.photoData.photoId}/likes`, config);
         this.isLiked = response.data.liked;
-        console.log('Is liked:', this.isLiked);
-        console.log('Likes count:', this.photoData.likesCount);
-        console.log('User ID:', this.userId);
+
       } catch (error) {
         console.error('Failed to check like status', error);
       }
@@ -68,21 +65,14 @@ export default {
         }
       };
       try {
-        console.log('Toggling like for photo', this.photoData.photoId);
-        console.log('Current isLiked: ', this.isLiked);
-        console.log('User: ', this.userId);
         if (!this.isLiked) {
-          const response = await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);
-          console.log('Like response:', response.status);
+          const response = await api.post(`/photos/${this.photoData.photoId}/likes`, {}, config);         
           this.photoData.likesCount++;
         } else {
           const response = await api.delete(`/photos/${this.photoData.photoId}/likes`, config);
-          console.log('Unlike response:', response.status);
           this.photoData.likesCount--;
         }
         this.isLiked = !this.isLiked;
-        console.log('Updated isLiked:', this.isLiked);
-        console.log('Updated likes count:', this.photoData.likesCount);
       } catch (error) {
         console.error('Failed to toggle like', error);
       }
