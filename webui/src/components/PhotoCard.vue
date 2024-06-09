@@ -42,10 +42,10 @@ export default {
   },
   mounted() {
     this.checkIfLiked();
-    this.$root.$on('usernameChanged', this.updateUsername);
+    this.$eventBus.$on('usernameChanged', this.updateUsername); // Listen for the event using the event bus
   },
   beforeUnmount() {
-    this.$root.$off('usernameChanged', this.updateUsername);
+    this.$eventBus.$off('usernameChanged', this.updateUsername); // Remove the event listener
   },
   methods: {
     async checkIfLiked() {

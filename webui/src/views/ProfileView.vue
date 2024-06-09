@@ -39,6 +39,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from "@/services/axios";
 import PhotoCard from '@/components/PhotoCard.vue';
+import eventBus from '@/eventBus'; 
 
 const route = useRoute();
 const router = useRouter();
@@ -75,11 +76,7 @@ const fetchUserProfile = async () => {
 const fetchPhotoDetails = async (photoIds) => {
   try {
     detailedPhotos.value = await Promise.all(photoIds.map(async (id) => {
-      const res = await api.get(`/photos/${id}`, {
-        headers: {
-          Authorization: `${localStorage.getItem('userId')}`
-        }
-      });
+      const res = await api.get(`/photos/${id}`);
       const photo = res.data;
       photo.comments = await Promise.all(photo.comments.map(async (comment) => {
         const userResponse = await api.get(`/users/${comment.userId}/username`);
@@ -172,7 +169,7 @@ const changeUsername = async () => {
     userProfile.value.username = newUsername.value; // Update the username in the view
     newUsername.value = ''; // Clear the input field
     alert('Username changed successfully!');
-    // Emit an event with the new username
+    eventBus.config.globalProperties.$emit('usernameChanged', newUsername.value); // Use the event bus
     router.push('/profile/' + userProfile.value.userId); // navigate to the new profile url
     window.location.reload(); // refresh the page
 
