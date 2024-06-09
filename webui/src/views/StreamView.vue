@@ -39,7 +39,11 @@ export default {
           headers: { Authorization: this.userId }
         });
         const photoIds = response.data; // Assuming this is an array of photo IDs
-        await this.fetchPhotoDetails(photoIds);
+        if (photoIds && photoIds.length > 0) {
+          await this.fetchPhotoDetails(photoIds);
+        } else {
+          this.photos = [];
+        }
       } catch (error) {
         console.error('Failed to fetch stream photos:', error);
         this.error = "Failed to load photos. Please try again later.";
