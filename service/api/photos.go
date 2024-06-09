@@ -158,7 +158,7 @@ func handleGetPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		return
 	}
 
-	photo, err := ctx.Database.GetPhoto(photoID)
+	photo, err := ctx.Database.GetPhoto(photoID, ctx.User.ID) // Pass the current user ID to filter banned users
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return

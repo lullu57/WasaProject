@@ -126,7 +126,7 @@ type AppDatabase interface {
 	GetCommentsByPhotoId(photoId string) ([]Comment, error)
 	GetFollowersByUsername(username string) ([]string, error)
 	GetUserProfileByID(userID string) (*User, error)
-	GetPhoto(photoId string) (*PhotoDetail, error)
+	GetPhoto(photoId, userId string) (*PhotoDetail, error)
 	GetUsername(userID string) (string, error)
 	IsLiked(photoID string, userID string) (bool, error)
 	IsUserFollowed(followerID, followedID string) (bool, error)

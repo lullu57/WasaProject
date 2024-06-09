@@ -117,7 +117,7 @@ func (db *appdbimpl) GetMyStream(userID string) ([]string, error) {
 	return photoIds, nil
 }
 
-func (db *appdbimpl) GetPhoto(photoId string) (*PhotoDetail, error) {
+func (db *appdbimpl) GetPhoto(photoId, userId string) (*PhotoDetail, error) {
 	var photo PhotoDetail
 
 	// First, fetch the basic photo details and count of likes
@@ -152,10 +152,19 @@ func (db *appdbimpl) GetPhoto(photoId string) (*PhotoDetail, error) {
 	// Iterate over the results and populate the comments slice
 	for rows.Next() {
 		var comment Comment
-		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.PhotoID, &comment.Content, &comment.Timestamp); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.Content, &comment.Timestamp); err != nil {
 			return nil, err
 		}
-		photo.Comments = append(photo.Comments, comment)
+
+		// Check if the comment's user is banned by the current user
+		isBanned, err := db.IsBannedBy(comment.UserID, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		if !isBanned {
+			photo.Comments = append(photo.Comments, comment)
+		}
 	}
 
 	if err = rows.Err(); err != nil {
