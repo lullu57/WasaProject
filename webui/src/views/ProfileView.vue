@@ -42,7 +42,7 @@ import PhotoCard from '@/components/PhotoCard.vue';
 
 const route = useRoute();
 const router = useRouter();
-const userId = route.params.profileId;
+const userId = ref(route.params.profileId);
 const userProfile = ref(null);
 const newUsername = ref('');
 const detailedPhotos = ref([]);
