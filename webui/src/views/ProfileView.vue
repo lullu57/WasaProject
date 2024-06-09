@@ -76,7 +76,9 @@ const fetchPhotoDetails = async (photoIds) => {
   try {
     detailedPhotos.value = await Promise.all(photoIds.map(async (id) => {
       const res = await api.get(`/photos/${id}`, {
-            headers: { Authorization: this.userId }
+        headers: {
+          Authorization: `${localStorage.getItem('userId')}`
+        }
           });
       const photo = res.data;
       photo.comments = await Promise.all(photo.comments.map(async (comment) => {
