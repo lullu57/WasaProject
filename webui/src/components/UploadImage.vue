@@ -30,11 +30,11 @@ export default {
         const response = await api.post('/photos', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `${localStorage.getItem('userId')}` // Assuming you use Bearer token
+            Authorization: `${localStorage.getItem('userId')}` 
           }
         });
         alert('Upload successful!');
-        window.location.reload(); // Refresh the page after successful upload
+        window.location.reload(); 
       } catch (error) {
         console.error('Upload failed:', error);
         alert('Upload failed!');

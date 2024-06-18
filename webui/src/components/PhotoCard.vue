@@ -30,13 +30,13 @@ import api from '@/services/axios';
 export default {
   props: {
     photo: Object,
-    userId: String // Add userId as a prop
+    userId: String
   },
   data() {
     return {
       showComments: true,
       newComment: '',
-      photoData: { ...this.photo }, // Initialize local state with prop data
+      photoData: { ...this.photo },
       isLiked: false
     };
   },
@@ -85,12 +85,12 @@ export default {
         };
         try {
           const response = await api.post(`/photos/${this.photoData.photoId}/comments`, { content: this.newComment }, config);
-          let username = 'You'; // Ideally fetch from server or use global state
+          let username = 'You'; 
           this.photoData.comments.push({
             username,
             content: this.newComment,
             commentId: response.data.commentId,
-            userId: this.userId // Use the computed property
+            userId: this.userId 
           });
           this.newComment = '';
         } catch (error) {
@@ -117,7 +117,6 @@ export default {
             Authorization: this.userId
           }
         });
-        // Emit an event to the parent component to remove the photo from the list
         this.$emit('photoDeleted', photoId);
       } catch (error) {
         console.error('Failed to delete photo', error);

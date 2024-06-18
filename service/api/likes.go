@@ -10,7 +10,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// HandleLikePhoto processes the request to like a photo
 func HandleLikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoID := ps.ByName("photoId") // Assuming you're using httprouter and path parameter named "photoId"
 	userID := ctx.User.ID           // Assuming `ctx` has a User object with ID field
@@ -31,7 +30,6 @@ func HandleLikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	fmt.Fprintln(w, "Photo liked successfully")
 }
 
-// HandleUnlikePhoto processes the request to unlike a photo
 func HandleUnlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoID := ps.ByName("photoId") // Assuming you're using httprouter and path parameter named "photoId"
 	userID := ctx.User.ID
