@@ -1,4 +1,4 @@
-```markdown:README.md
+
 # Fantastic Coffee (Decaffeinated)
 
 This repository is an assignment for the **Web and Software Architecture** course at **Sapienza University** in 2024. It serves as a foundational project structure for developing web applications using Go and Vue.js.
